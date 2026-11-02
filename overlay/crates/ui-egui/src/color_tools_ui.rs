@@ -274,16 +274,34 @@ pub(crate) fn below_fields(app: &mut FigApp, ui: &mut Ui, c: Color, target: &Pic
         ui.add_space(16.0);
         copy_as(app, ui, c, profile);
     });
-    ui.horizontal(|ui| {
-        ui.add_space(16.0);
-        ui.spacing_mut().item_spacing.x = 8.0;
-        let w = ((ui.available_width() - 16.0 - 8.0) / 2.0).max(80.0);
-        let on_bg = format!("{} · {} {}", tr("This colour on its background"), tr("Contrast with"), bg.to_css_hex());
-        let swapped = format!("{} · {} {}", tr("Its background on this colour"), tr("Contrast with"), fg.to_css_hex());
-        pairing(ui, w, ways[0], &on_bg, better == Some(0));
-        pairing(ui, w, ways[1], &swapped, better == Some(1));
-    });
+    let on_bg = format!("{} · {} {}", tr("This colour on its background"), tr("Contrast with"), bg.to_css_hex());
+    let swapped = format!("{} · {} {}", tr("Its background on this colour"), tr("Contrast with"), fg.to_css_hex());
+    // Side by side when both fit; one under the other in a narrow picker (Hex, CSS), so their
+    // captions aren't cut.
+    let full = ui.available_width() - 32.0;
+    if full >= 2.0 * PAIRING_W + 8.0 {
+        ui.horizontal(|ui| {
+            ui.add_space(16.0);
+            ui.spacing_mut().item_spacing.x = 8.0;
+            let w = (full - 8.0) / 2.0;
+            pairing(ui, w, ways[0], &on_bg, better == Some(0));
+            pairing(ui, w, ways[1], &swapped, better == Some(1));
+        });
+    } else {
+        for (i, caption) in [on_bg, swapped].iter().enumerate() {
+            if i > 0 {
+                ui.add_space(6.0);
+            }
+            ui.horizontal(|ui| {
+                ui.add_space(16.0);
+                pairing(ui, full.max(PAIRING_W), ways[i], caption, better == Some(i));
+            });
+        }
+    }
 }
+
+/// The width one contrast sample needs: the swatch, and "4.50:1 AA Large" beside it.
+const PAIRING_W: f32 = 132.0;
 
 #[cfg(test)]
 mod tests {

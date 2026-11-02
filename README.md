@@ -11,7 +11,7 @@
 </p>
 
 <p align="center">
-  <b>FigCraft Plus 12</b> · built on FigCraft <b>v0.14.0</b>, the latest official release ·
+  <b>FigCraft Plus 13</b> · built on FigCraft <b>v0.14.0</b>, the latest official release ·
   <code>.figcraft</code> files stay compatible with the official app, both ways
 </p>
 

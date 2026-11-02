@@ -210,7 +210,12 @@ inside). Lessons learned:
 
 ## 8. Where things stand (update this section when you finish work)
 
-- **Released:** Plus 12 on FigCraft v0.14.0 (2026-11-01): ported (all hooks applied as they
+- **Released:** Plus 13 on FigCraft v0.14.0 (2026-11-02): fixes. The style dialog's swatch opens
+  the picker with `app.open_picker(target, Some(rect))` — setting `app.ui.picker` alone leaves
+  `picker_button` empty, and `picker_place_ui::open` can't place it beside the dialog (test in
+  `picker_follow_tests.rs`); the contrast samples stack below 2 × 132 px. README screenshots
+  retaken on 0.14 (light theme; the demo GIFs dark).
+- **Plus 12** on FigCraft v0.14.0 (2026-11-01): ported (all hooks applied as they
   were; `tokens_css` uses 0.14's `CssNames`), roadmap stage 4. Engine `responsive.rs` (layer data
   `figcraftplus.layout`: `width 50%`, `height 100vh`, `direction {Var}`…; `resolve` runs in
   `derived::normalize` after the OKLCH links; commands `layout.relative`, `layout.bindVariable`)

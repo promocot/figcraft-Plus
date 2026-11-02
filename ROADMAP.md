@@ -80,6 +80,7 @@ Full details in the [changelog](CHANGELOG.md).
 
 | Release | Highlights |
 |---|---|
+| **Plus 13** | Fixes: the picker beside a colour style's dialog again; contrast samples one under the other in a narrow picker |
 | **Plus 12** | On FigCraft 0.14.0 · **sizes in %, vw and vh** that follow the parent or the viewport frame · **auto layout from variables** (direction, wrap, alignment, sizing per mode) · **align to a key object** |
 | **Plus 11** | **CSS for code** (oklch, rem, relative colours, `color-mix()`, `calc()`) and **CSS import** · several text styles at once, variables bound by name · remembered missing-font replacements · the **Design System Inspector** |
 | **Plus 10** | The colour picker follows the selection again (clicks on the canvas and in Layers) · *Picker follows the selection* in Preferences, to turn it off |

@@ -745,7 +745,8 @@ fn paint_field(app: &mut FigApp, ui: &mut Ui, st: &Style, paints: &[Paint], i: u
     let sw = Rect::from_center_size(pos2(r.min.x + 13.0, r.center().y), vec2(14.0, 14.0));
     widgets::paint_swatch(ui.painter(), sw, p);
     if ui.interact(sw.expand(3.0), Id::unique(("sd_sw", &st.id, i)), Sense::click()).tip(tr("Edit colour")).clicked() {
-        app.ui.picker = Some(crate::colorpicker::PickerTarget::Style { id: st.id.clone(), index: i });
+        // With its button, so the picker opens beside the dialog (`picker_place_ui::open`).
+        app.open_picker(crate::colorpicker::PickerTarget::Style { id: st.id.clone(), index: i }, Some(sw));
     }
     let text_r = Rect::from_min_max(pos2(sw.max.x + 8.0, r.min.y + 4.0), pos2(r.max.x - 52.0, r.max.y - 4.0));
     match &p.kind {

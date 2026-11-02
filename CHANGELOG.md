@@ -7,6 +7,14 @@ Every FigCraft Plus release, newest first. Each one is built on an official FigC
 **🟣 Exclusive** — FigCraft has nothing like it yet. **🔵 Enhanced** — FigCraft has a basic
 version; Plus goes further.
 
+## Plus 13 · FigCraft v0.14.0 — 2026-11-02
+
+- Fixed: the colour picker opened from a colour style's swatch covered the style dialog; it opens
+  beside the dialog again.
+- Fixed: in a narrow colour picker (Hex, CSS) the two contrast samples cut their captions ("✓ Reads
+  better"); there they now stand one under the other.
+- README: every screenshot and demo retaken on FigCraft 0.14.
+
 ## Plus 12 · FigCraft v0.14.0 — 2026-11-01
 
 Every add-on carried over to FigCraft 0.14.0 (nothing it added duplicates Plus; the CSS export now

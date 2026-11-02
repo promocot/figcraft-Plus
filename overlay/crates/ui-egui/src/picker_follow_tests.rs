@@ -70,3 +70,26 @@ fn turned_off_the_picker_closes_on_another_layer() {
     assert!(u.app.ui.picker.is_none(), "as in FigCraft: {:?}", u.app.ui.picker);
     crate::picker_place_ui::set_follows_for_test(None);
 }
+
+#[test]
+fn a_style_dialogs_swatch_opens_the_picker_beside_the_dialog() {
+    let mut s = Session::new();
+    let id = s.execute("style.create", &json!({"type": "paint", "name": "Accent", "value": "#3366FF"})).unwrap()["id"].as_str().unwrap().to_string();
+    let mut u = Ui::new(s);
+    let ctx = u.ctx.clone();
+    crate::style_dialog_ui::open_edit(&mut u.app, &ctx, &id, 200.0);
+    for _ in 0..3 {
+        u.frame(vec![]);
+    }
+    let dialog = ctx.memory(|m| m.area_rect(egui::Id::unique("figcraftplus_style_dialog_area"))).expect("the dialog is open");
+    // The paint's swatch, at the left of its row in Properties: click up the dialog's left side
+    // until one opens the picker.
+    let mut y = dialog.max.y - 8.0;
+    while u.app.ui.picker.is_none() && y > dialog.center().y {
+        click(&mut u, egui::pos2(dialog.min.x + 29.0, y));
+        y -= 4.0;
+    }
+    assert_eq!(u.app.ui.picker, Some(PickerTarget::Style { id, index: 0 }));
+    let picker = ctx.memory(|m| m.area_rect(crate::colorpicker::window_id())).expect("the picker is open");
+    assert!(picker.max.x <= dialog.min.x + 1.0, "beside the dialog, not over it: {picker:?} {dialog:?}");
+}
