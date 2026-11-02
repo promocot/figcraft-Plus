@@ -356,7 +356,7 @@ the files and keeps the last computed values.
 - **Coming later:** `%`, `vw` and `vh` — sizes relative to the parent frame
   ([roadmap](ROADMAP.md)).
 
-<img src="docs/images/31-print-units.png" width="556" alt="Typing 210mm in W; after Enter the frame is 595.28 × 841.89 — an A4 page">
+<img src="docs/images/31-print-units.png" width="508" alt="Typing 210mm in W; after Enter the frame is 595.28 × 841.89 — an A4 page">
 
 ### CMYK and Copy as in the colour picker
 
@@ -366,7 +366,7 @@ the files and keeps the last computed values.
 >
 > **FigCraft Plus:** **CMYK** fields in the picker, and **Copy as** — the colour in any format, one click.
 
-<img src="docs/images/32-cmyk-contrast.png" width="358" alt="The picker in CMYK: C, M, Y, K fields, Copy as and the contrast line 4.78:1 AA · Lc -36">
+<img src="docs/images/32-cmyk-contrast.png" width="328" alt="The picker in CMYK: C, M, Y, K fields, Copy as, and the contrast both ways — 3.61:1 AA Large, Lc 60 and Lc -65">
 
 - **CMYK** in the model menu: C, M, Y and K in percent. They are converted exactly the way
   FigCraft's CMYK PDF export converts (`K = 1 − max(R, G, B)`), so what you see is what the PDF
@@ -384,7 +384,7 @@ the files and keeps the last computed values.
 >
 > **FigCraft Plus:** Under the picker's fields, two `Aa` samples — the colour on what is really under the layer, and that background's colour on the colour — each with the WCAG 2 ratio and level and the APCA Lc. The pairing that reads better is marked.
 
-<img src="docs/images/34-contrast-backdrop.png" width="350" alt="A white button on a magenta rectangle: the picker shows 6.46:1 AA · Lc -86 against the magenta">
+<img src="docs/images/34-contrast-backdrop.png" width="257" alt="A white button on a berry rectangle: the picker measures 6.46:1 AA and Lc -86 against the berry, Lc 81 the other way">
 
 <img src="docs/images/39-contrast-both-ways.png" width="362" alt="Under the picker's fields: white Aa on blue, 8.72:1 AAA, Lc -94, marked Reads better; blue Aa on white, 8.72:1 AAA, Lc 89">
 
@@ -406,7 +406,7 @@ the files and keeps the last computed values.
 >
 > **FigCraft Plus:** A **Libraries** tab beside **Custom** in the colour picker: this file's and the enabled libraries' colour variables, with search — only those whose scope fits what you edit.
 
-<img src="docs/images/35-picker-libraries.png" width="548" alt="Libraries for a fill: Primary and Blue colours; for a stroke of the same layer: only the Border colours">
+<img src="docs/images/35-picker-libraries.png" width="530" alt="Libraries for a fill: Primary and Blue colours; for a stroke of the same layer: only the Border colours">
 
 - **Only variables whose scope fits** are listed: a fill lists the variables scoped to frame,
   shape or text fills (by what the layer is), a stroke those scoped to strokes, a shadow's colour
@@ -427,7 +427,7 @@ the files and keeps the last computed values.
 >
 > **FigCraft Plus:** **Preferences ▸ FigCraft Plus**: the layout and text units and the root size for new files, and the model the colour picker opens in.
 
-<img src="docs/images/37-preferences.png" width="488" alt="Preferences with the FigCraft Plus section: layout unit, text unit, default root size, colour picker opens in">
+<img src="docs/images/37-preferences.png" width="440" alt="Preferences ▸ FigCraft Plus: layout unit, text unit, default root size, decimals shown, the model the colour picker opens in, Picker follows the selection, Key object for aligning">
 
 | Setting | What it does |
 |---|---|
@@ -479,7 +479,7 @@ They are saved in `figcraft-plus.json` next to `figcraft.exe`, so a copy on a US
 > **FigCraft Plus:** Each channel (L, C, H, R, G, B, H, S, alpha…) can follow its own number variable: one `brand/hue` restyles every colour built on it.
 
 <p>
-<img src="docs/images/05-bound-hue-280.png" width="440" alt="H bound to brand/hue = 280: a purple card">
+<img src="docs/images/05-bound-hue-280.png" width="440" alt="H bound to brand/hue = 280: a violet card">
 <img src="docs/images/06-bound-hue-130.png" width="440" alt="The same card after brand/hue is set to 130: green">
 </p>
 
@@ -497,7 +497,7 @@ layers, styles and variables — in one undo step.
 
 1. Open the picker and choose RGB, HSL, HSB or OKLCH. Hover a field: the variable button appears.
 
-   <img src="docs/images/03-variable-button.png" width="360" alt="The variable button on the H field">
+   <img src="docs/images/03-variable-button.png" width="340" alt="The variable button on the H field">
 
 2. Click it and pick a number variable (grouped by collection).
 
@@ -514,7 +514,7 @@ layers, styles and variables — in one undo step.
 Switching to another model shows which channels are linked elsewhere; binding in the current
 model replaces those links.
 
-<img src="docs/images/08-linked-in-other-model.png" width="360" alt="The HSL row noting links made in OKLCH">
+<img src="docs/images/08-linked-in-other-model.png" width="345" alt="The HSL row noting links made in OKLCH">
 
 - Works wherever the picker edits a colour: layer fills and strokes, **gradient stops**, effect
   colours (shadows, noise), the **page background**, **colour styles** and **colour variables**.
@@ -544,7 +544,7 @@ model replaces those links.
 
 <p>
 <img src="docs/images/12-text-variables.png" width="560" alt="A text layer with font family, weight and paragraph spacing bound to variables">
-<img src="docs/images/13-weight-or-style-list.png" width="300" alt="The font style dropdown's list: number and string variables">
+<img src="docs/images/13-weight-or-style-list.png" width="272" alt="The font style dropdown's list: number and string variables">
 </p>
 
 FigCraft binds the font family and font style to string variables. FigCraft Plus binds the rest of
@@ -587,8 +587,8 @@ the Typography section:
 > **FigCraft Plus:** A **+** on Local styles creates any kind of style from scratch in a dialog with a live preview, with variables in effect, grid and colour fields too.
 
 <p>
-<img src="docs/images/15-create-style-menu.png" width="250" alt="The + menu on Local styles: Text, Color, Effect, Layout grid">
-<img src="docs/images/22-style-dialog-text.png" width="380" alt="Create new text style: preview, name, font, weight and size bound to variables">
+<img src="docs/images/15-create-style-menu.png" width="236" alt="The + menu on Local styles: Text, Color, Effect, Layout grid">
+<img src="docs/images/22-style-dialog-text.png" width="306" alt="Create new text style: preview, name Heading/H1, Inter, the weight bound to weight/bold, size 40">
 </p>
 <p>
 <img src="docs/images/23-style-dialog-effect.png" width="440" alt="Create new effect style with the drop shadow's settings beside it">
