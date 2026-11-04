@@ -350,14 +350,14 @@ typography composites are skipped with a warning in the toast.
 
 ### 30. Export presets
 
-**Try it.** Select one or more frames › Design panel › **Export** › **Export with a preset…** ›
+**Try it.** Select one or more frames › Design panel › **Export** › **Presets…** ›
 **Web · PNG 1x, 2x, 3x** › choose a folder.
 
 **You should see.** Three files per frame: `Card@1x.png`, `Card@2x.png`, `Card@3x.png`. Other
 presets: *Social · 1080 px PNG and JPG* (`Card_1080x1440.png` …), *Every format* (folders png/,
 jpg/, svg/, pdf/), *Print PDF* (CMYK, 3 mm bleed, crop marks).
 
-**Also check.** Add export settings to a layer (**+**), then **Export with a preset…** › **Save
+**Also check.** Add export settings to a layer (**+**), then **Presets…** › **Save
 these settings as a preset**: it appears in the list. **Edit presets…** opens Preferences ›
 **Export presets**: rename, change the pattern (`{frame}/{name}_{w}x{h}`), remove. Two layers
 with the same name get `Card.png` and `Card 2.png`.

@@ -46,7 +46,7 @@ pub(crate) struct Prefs {
     pub key_object: bool,
     /// The resolution (DPI) new top-level frames are made at.
     pub dpi: f64,
-    /// Export presets (Export ▸ Export with a preset…).
+    /// Export presets (Export ▸ Presets…).
     pub export_presets: Vec<crate::presets_ui::Preset>,
 }
 

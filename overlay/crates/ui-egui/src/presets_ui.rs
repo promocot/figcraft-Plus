@@ -1,6 +1,6 @@
 //! FigCraft Plus: export presets (`figcraft_engine::cmd::export_presets`).
 //!
-//! In the Export section, **Presets** exports the selected layers with a saved set of sizes and
+//! In the Export section, **Presets…** exports the selected layers with a saved set of sizes and
 //! formats, the files named by its pattern (`{name}_{w}x{h}`…), into a folder (a zip in the
 //! browser). *Save these settings as a preset* keeps the selected layer's own export settings as a
 //! new one. Presets live in Preferences ▸ FigCraft Plus, where they are renamed, their pattern
@@ -98,7 +98,7 @@ pub(crate) fn row(app: &mut FigApp, ui: &mut Ui, doc: &Document, sel: &[NodeId])
     let resp = ui
         .horizontal(|ui| {
             ui.add_space(16.0);
-            widgets::button(ui, tr("Export with a preset…"), false, true)
+            widgets::button(ui, tr("Presets…"), false, true).on_hover_text(tr("Export with a preset: several sizes and formats, files named by a pattern"))
         })
         .inner;
     let mut chosen: Option<Preset> = None;

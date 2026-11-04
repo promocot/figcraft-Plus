@@ -112,6 +112,25 @@ fn round(x: f64) -> f64 {
     (x * 10_000.0).round() / 10_000.0
 }
 
+/// Put `token` at `path` / `last` under `group`, making the groups on the way (a token in the way
+/// of a group gives it its name).
+fn insert(group: &mut Map<String, Value>, path: &[String], last: &str, token: Value) {
+    match path.split_first() {
+        None => {
+            group.insert(last.to_string(), token);
+        }
+        Some((p, rest)) => {
+            let next = group.entry(p.clone()).or_insert_with(|| Value::Object(Map::new()));
+            if !next.is_object() || next.get("$value").is_some() {
+                *next = Value::Object(Map::new());
+            }
+            if let Value::Object(m) = next {
+                insert(m, rest, last, token);
+            }
+        }
+    }
+}
+
 /// The tokens of `colls` as a DTCG document.
 pub fn dtcg(doc: &Document, colls: &[&Collection]) -> Value {
     let roles = Roles::new(doc);
@@ -162,17 +181,7 @@ pub fn dtcg(doc: &Document, colls: &[&Collection]) -> Value {
             // Into its groups.
             let parts: Vec<String> = v.name.split('/').map(segment).filter(|s| !s.is_empty()).collect();
             let Some((last, path)) = parts.split_last() else { continue };
-            let mut at = &mut group;
-            for p in path {
-                let next = at.entry(p.clone()).or_insert_with(|| Value::Object(Map::new()));
-                if !next.is_object() || next.get("$value").is_some() {
-                    // A token and a group of one name: the group wins the name, the token keeps `_`.
-                    *next = Value::Object(Map::new());
-                }
-                let Value::Object(m) = next else { break };
-                at = m;
-            }
-            at.insert(last.clone(), Value::Object(token));
+            insert(&mut group, path, last, Value::Object(token));
         }
         if c.modes.len() > 1 {
             group.insert("$extensions".into(), json!({MODES: c.modes.iter().map(|m| m.name.clone()).collect::<Vec<_>>()}));
@@ -407,6 +416,18 @@ fn import(s: &mut Session, p: &Value) -> Result<Value> {
     };
     // Mode names per collection, in first-seen order (the first mode is "Default" unless named).
     let mut coll_modes: BTreeMap<String, Vec<String>> = BTreeMap::new();
+    // A collection's own mode list keeps their order (the first is the default mode).
+    for (k, g) in root {
+        if let Some(Value::Array(list)) = g.get("$extensions").and_then(|e| e.get(MODES)) {
+            let name = into.clone().unwrap_or_else(|| k.clone());
+            let e = coll_modes.entry(name).or_default();
+            for m in list.iter().filter_map(Value::as_str) {
+                if !e.iter().any(|x| x == m) {
+                    e.push(m.to_string());
+                }
+            }
+        }
+    }
     for t in &tokens {
         let (c, _) = place(&t.path);
         let e = coll_modes.entry(c).or_default();
@@ -606,7 +627,7 @@ mod tests {
         assert!(r["warnings"].as_array().unwrap().is_empty(), "{r}");
         let doc = t.doc().unwrap();
         let coll = doc.variables.collections.iter().find(|c| c.name == "Brand").unwrap();
-        assert_eq!(coll.modes.iter().map(|m| m.name.as_str()).collect::<Vec<_>>(), vec!["Default", "Dark"]);
+        assert_eq!(coll.modes.iter().map(|m| m.name.as_str()).collect::<Vec<_>>(), vec!["Mode 1", "Dark"], "in their order, the first the default");
         let blue2 = doc.variables.get("color/blue").unwrap();
         assert_eq!(blue2.values.get(&coll.modes[1].id), Some(&VariableValue::Color(Color::from_hex("#88A0FF").unwrap())));
         let prim2 = doc.variables.get("color/primary").unwrap();

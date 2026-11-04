@@ -23,16 +23,10 @@ Everything below serves one of them.
 | **4** | ✅ done in Plus 12 | Responsive layout |
 | **5** | ✅ done in Plus 14 | Web typography and colour tokens |
 | **6** | ✅ done in Plus 14 | Print: resolution per frame, PDF/X |
-| ▶ | next | Export presets, design tokens exchange |
+| **7** | ✅ done in Plus 15 | Export presets, design tokens (DTCG) |
+| ▶ | next | Your feedback: bugs and improvements from the [guide](docs/GUIDE.md)'s scenarios |
 
 ---
-
-## 📦 Next
-
-| | Feature | What it gives you |
-|---|---|---|
-| ⬜ | **Export presets** — a set of sizes, formats and a file-name pattern (`{frame}_{w}x{h}`), exported in one click | Product cards and banners in every size at once |
-| ⬜ | **Design tokens (DTCG) import and export** | Exchange tokens with other tools in the standard format |
 
 ## 💡 Ideas we are considering
 
@@ -63,6 +57,7 @@ Full details in the [changelog](CHANGELOG.md).
 
 | Release | Highlights |
 |---|---|
+| **Plus 15** | On FigCraft 0.15.0 · **export presets** (sizes, formats, a name pattern) · **design tokens (DTCG)** both ways · the [guide](docs/GUIDE.md) |
 | **Plus 14** | **Line height in % from a variable** · **gradients blended in OKLCH** (gradient tokens) · **resolution (DPI) per frame** · **PDF/X-4** for coated FOGRA39 |
 | **Plus 13** | Fixes: the picker beside a colour style's dialog again; contrast samples one under the other in a narrow picker |
 | **Plus 12** | On FigCraft 0.14.0 · **sizes in %, vw and vh** that follow the parent or the viewport frame · **auto layout from variables** (direction, wrap, alignment, sizing per mode) · **align to a key object** |

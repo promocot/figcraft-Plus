@@ -11,7 +11,7 @@
 </p>
 
 <p align="center">
-  <b>FigCraft Plus 14</b> · built on FigCraft <b>v0.14.0</b>, the latest official release ·
+  <b>FigCraft Plus 15</b> · built on FigCraft <b>v0.15.0</b>, the latest official release ·
   <code>.figcraft</code> files stay compatible with the official app, both ways
 </p>
 
@@ -113,11 +113,11 @@ what you edit are offered.
 
 > ### 🗺 Roadmap — what's next
 >
-> **Just done (Plus 14):** line height in % from a variable · gradients blended in OKLCH ·
-> **a resolution (DPI) per frame** for print · PDF/X-4.
+> **Just done:** export presets and design tokens (DTCG) in Plus 15; line height in % from a
+> variable, gradients blended in OKLCH, **a resolution (DPI) per frame** and PDF/X-4 in Plus 14.
 >
-> **Next:** export presets (every size and format in one click) · design tokens (DTCG) import and
-> export.
+> **Next:** your feedback — try the features with the [**guide**](docs/GUIDE.md) and
+> [report](../../issues/new/choose) what doesn't work or could be easier.
 >
 > **[See the full roadmap →](ROADMAP.md)** · **[Ask for a feature →](../../issues/new?template=feature_request.yml)**
 > — the most 👍-ed requests move up.
@@ -125,6 +125,7 @@ what you edit are offered.
 ## Contents
 
 - [Why FigCraft Plus](#why-figcraft-plus) · [See it in action](#see-it-in-action) · [Roadmap](ROADMAP.md) · [Changelog](CHANGELOG.md)
+- **[Guide: every feature step by step](docs/GUIDE.md)** · [Reporting bugs](#reporting-bugs)
 - [Download and update](#download-and-update)
 - [Feature comparison](#feature-comparison)
 - [Requested in FigCraft's issues, made here](#requested-in-figcrafts-issues-made-here)
@@ -157,6 +158,9 @@ what you edit are offered.
   - [Gradient tokens: gradients blended in OKLCH](#gradient-tokens-gradients-blended-in-oklch)
   - [Resolution (DPI) per frame](#resolution-dpi-per-frame)
   - [PDF/X-4 for print](#pdfx-4-for-print)
+  - [Export presets](#export-presets)
+  - [Design tokens (DTCG)](#design-tokens-dtcg)
+- [Reporting bugs](#reporting-bugs)
 - [Community](#community)
 - [FAQ](#faq)
 - [How it works](#how-it-works)
@@ -172,7 +176,7 @@ what you edit are offered.
 version; Plus goes further. Features FigCraft has since added itself are
 [listed separately](#now-in-figcraft-itself-removed-from-plus) — they are no longer part of Plus.
 
-| Feature | In FigCraft v0.14.0 | In FigCraft Plus | |
+| Feature | In FigCraft v0.15.0 | In FigCraft Plus | |
 |---|---|---|---|
 | [OKLCH, done the oklch.com way](#oklch-done-the-oklchcom-way) | FigCraft has OKLCH fields: lightness in percent, sRGB only, and the HSB square and rainbow stay HSB. | The whole picker works in OKLCH (an OKLCH plane with the exact gamut edge, an OKLCH hue strip), values match oklch.com and CSS, and Display P3 files are read in P3. | 🔵 Enhanced |
 | [Derived colours and calculated variables](#derived-colours-and-calculated-variables) | A variable can be an *alias* of another — an exact copy, nothing more. | A colour can be *made from* another (transparency, lighter / darker, its complement, a mix of two), and a number from other numbers, all kept in step in every mode. | 🟣 Exclusive |
@@ -200,6 +204,8 @@ version; Plus goes further. Features FigCraft has since added itself are
 | [Gradient tokens: gradients blended in OKLCH](#gradient-tokens-gradients-blended-in-oklch) | Gradient stops take colour variables; gradients mix their stops in sRGB (blue → yellow passes through grey). | **Blend · OKLCH** in the picker: the gradient — a layer's or a paint style's — is mixed in OKLCH between its stops and kept in step with their variables, as CSS's `linear-gradient(in oklch, …)`. | 🔵 Enhanced |
 | [Resolution (DPI) per frame](#resolution-dpi-per-frame) | A pixel is a point (72 per inch) everywhere. | Each top-level frame has its own **DPI**: 72 → 300 scales it and its contents so its size in mm stays, and moves what is beside it; mm, cm, in and pt follow it; PNG / JPG say their DPI and a PDF page keeps the physical size. | 🟣 Exclusive |
 | [PDF/X-4 for print](#pdfx-4-for-print) | A CMYK PDF with bleed, marks and page boxes, converted by formula, without an output intent. | **PDF/X-4** for coated FOGRA39 paper: the output intent with its ICC profile, colours converted through it, transparency in CMYK — what print shops' preflight asks for. | 🔵 Enhanced |
+| [Export presets](#export-presets) | Each layer keeps its own export settings; files are named after the layer with a suffix. | **Presets…**: several sizes and formats for every selected layer at once, files named by a pattern (`{name}_{w}x{h}`, folders with `/`); presets saved and edited in Preferences. | 🔵 Enhanced |
+| [Design tokens (DTCG)](#design-tokens-dtcg) | Variables export as JSON, CSS, Tailwind, Dart and import from FigCraft's JSON. | **DTCG JSON** both ways — the W3C Design Tokens format other tools read: `$type`, `$value`, aliases, every mode. | 🟣 Exclusive |
 | [Reorder variables: drag & drop and sorting](#reorder-variables-drag--drop-and-sorting) | Modes can be reordered; variables keep the order they were made in. | Drag variables, groups and collections, multi-select, Alt+↑/↓, and natural or by-value sorting — also as commands for scripts and MCP. | 🟣 Exclusive |
 
 Everything stays a normal `.figcraft` file: the official app opens it and sees the last computed
@@ -919,6 +925,56 @@ in exports. That fixes imports that arrive in the wrong order (`n-xs, n-6xl, n-s
   from the FOGRA39 characterisation data. Ask your print shop which condition it prints to; for
   another one, convert in your RIP or preflight tool.
 - The choice is kept in the file as text the official app ignores; it exports FigCraft's own PDF.
+
+### Export presets
+
+**🔵 Enhanced** — better in FigCraft Plus
+
+> **FigCraft:** Each layer has its own export settings (size, suffix, format); files are named after the layer.
+>
+> **FigCraft Plus:** **Presets…** in the Export section: every selected layer in several sizes and formats at once, named by a pattern.
+
+- Four presets to start with: *Web · PNG 1x, 2x, 3x* (`{name}@{scale}`), *Social · 1080 px PNG and
+  JPG*, *Every format* (a folder per format), *Print PDF* (CMYK, bleed, crop marks).
+- Patterns: `{name}` `{frame}` `{page}` `{w}` `{h}` `{scale}` `{format}` `{n}` `{date}`; a `/`
+  makes folders. A name used twice gets a number.
+- *Save these settings as a preset* keeps the selected layer's own export settings; *Edit
+  presets…* opens **Preferences ▸ FigCraft Plus ▸ Export presets** (rename, pattern, remove).
+- The same as a command for scripts and MCP: `export.preset`.
+
+### Design tokens (DTCG)
+
+**🟣 Exclusive** — only in FigCraft Plus (for now)
+
+> **FigCraft:** Variables export as JSON, CSS, Tailwind and Dart, and import from FigCraft's own JSON.
+>
+> **FigCraft Plus:** The **W3C Design Tokens (DTCG)** format, both ways — what Style Dictionary, Tokens Studio and other tools exchange.
+
+- **Variables ▸ Export ▸ Design tokens (DTCG)…**: collections as top-level groups, `/` as nested
+  groups; `$type` (`color`, `dimension`, `number`, `fontWeight`, `fontFamily`) and `$value`;
+  aliases as `{Brand.color.blue}`; the first mode as `$value` and every mode in
+  `$extensions["figcraft.modes"]`; a Plus formula in `$extensions["figcraft.formula"]`.
+- **Variables ▸ Import ▸ Design tokens (DTCG)…**: groups become names, top-level groups
+  collections, modes come back; tokens from other tools read too — colours (hex, CSS colours,
+  `{colorSpace, components}`), dimensions (px, rem of 16), numbers, font weights (`bold` = 700),
+  durations and font families. Composite tokens (shadow, typography, gradient) are skipped with a
+  warning.
+- Commands: `variable.exportDtcg`, `variable.importDtcg`.
+
+## Reporting bugs
+
+FigCraft Plus adds to FigCraft; it doesn't compete with it or replace it. So its issue tracker takes
+**only FigCraft Plus's own features**:
+
+1. Find the feature in the [**guide**](docs/GUIDE.md) and follow its steps.
+2. Try the same in the **official FigCraft of the same version** (the release name says which). If
+   it happens there too, report it in [FigCraft's tracker](https://github.com/storytold/figcraft/issues):
+   their fix reaches Plus with their next release.
+3. Otherwise, [**report it here**](../../issues/new?template=bug_report.yml) — the form asks for the
+   feature, the steps and what you expected.
+
+Plus doesn't patch FigCraft's own behaviour: a fix of ours would only have to be undone when
+theirs arrives. Ideas and "this could be easier" go in a [feature request](../../issues/new?template=feature_request.yml).
 
 ## Community
 

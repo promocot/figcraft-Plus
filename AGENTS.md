@@ -210,7 +210,21 @@ inside). Lessons learned:
 
 ## 8. Where things stand (update this section when you finish work)
 
-- **Released:** Plus 14 on FigCraft v0.14.0 (2026-11-04): roadmap stages 5 and 6.
+- **Released:** Plus 15 on FigCraft v0.15.0 (2026-11-04): every add-on carried to 0.15.0 (the hooks
+  apply unchanged) and the roadmap's "Next".
+  - Engine `dtcg.rs`: `variable.exportDtcg` / `variable.importDtcg` (W3C Design Tokens: collections
+    as groups, `$type` / `$value`, `{a.b}` aliases, modes in `$extensions["figcraft.modes"]`, the
+    mode order kept at the collection level). UI: Variables ▸ Export / Import ▸ *Design tokens
+    (DTCG)…* (`tokens_ui::export_dtcg`, `import_dtcg`).
+  - Engine `export_presets.rs`: `export.preset {ids, items, pattern, dir | zip}`. UI `presets_ui.rs`:
+    *Presets…* in the Export section (its label must not start with "Export ": `export_name_tests`
+    look for one such button), presets kept in the Plus preferences (`export_presets`).
+  - Hook 0026; its `cmd.rs` anchors sit after the `ds_inspect` lines so hook 0002's block stays in
+    one piece (re-applying would duplicate it otherwise).
+  - `docs/GUIDE.md`: every feature as steps to try, what to see, and what isn't a Plus bug; the bug
+    form (`.github/ISSUE_TEMPLATE`) takes only Plus features. Keep the guide's numbering and the
+    form's dropdown in step when adding a feature.
+- **Plus 14** on FigCraft v0.14.0 (2026-11-04; published on 0.15.0): roadmap stages 5 and 6.
   - Engine `leading.rs`: line height in % from a number variable (layer data
     `figcraftplus.lineHeight`, a text style's description line `lineHeight {name}`; ≤ 5 is a
     ratio); commands `text.lineHeightVariable`, `style.lineHeightVariable`. UI `leading_ui.rs`: the
