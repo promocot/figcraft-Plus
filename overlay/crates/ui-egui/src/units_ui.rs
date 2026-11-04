@@ -61,11 +61,14 @@ thread_local! {
 
 /// px in one `unit` (`root`: the file's root size).
 pub(crate) fn per(unit: &str, root: f64) -> f64 {
+    // FigCraft Plus: print lengths at the resolution of the selection's frame (`dpi_ui`).
+    let dpi = crate::dpi_ui::dpi();
     match unit {
         "rem" => root,
-        "mm" => 72.0 / 25.4,
-        "cm" => 72.0 / 2.54,
-        "in" => 72.0,
+        "mm" => dpi / 25.4,
+        "cm" => dpi / 2.54,
+        "in" => dpi,
+        "pt" => dpi / 72.0,
         _ => 1.0,
     }
 }

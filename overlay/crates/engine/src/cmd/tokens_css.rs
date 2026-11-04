@@ -74,6 +74,8 @@ struct Out<'a> {
     in_colours: BTreeSet<VariableId>,
     /// Each variable's custom property, unique in the file (FigCraft's own names).
     names: CssNames,
+    /// Number variables line heights follow as a percentage (`leading`): a unitless ratio in CSS.
+    leading: BTreeSet<VariableId>,
 }
 
 impl Out<'_> {
@@ -102,6 +104,9 @@ impl Out<'_> {
     }
 
     fn number(&self, v: &Variable, x: f64) -> String {
+        if self.leading.contains(&v.id) {
+            return num(crate::leading::percent_of(x) / 100.0, 4);
+        }
         match self.rem {
             _ if self.unitless(v) => trim_num(x),
             Some(root) => format!("{}rem", num(x / root, 4)),
@@ -248,7 +253,14 @@ pub fn css(doc: &Document, colls: &[&Collection], oklch: bool, rem: Option<f64>,
             }
         }
     }
-    let out = Out { doc, oklch, rem, formulas, roles: Roles::new(doc), in_colours, names: CssNames::new(doc) };
+    // Line-height variables (`leading`): `line-height: var(--leading-normal)` takes a ratio.
+    let leading: BTreeSet<VariableId> = doc
+        .ids()
+        .filter_map(|id| crate::leading::layer_rule(doc, id))
+        .chain(doc.styles.iter().filter_map(|st| crate::leading::style_rule(doc, &st.id)))
+        .filter_map(|n| doc.variables.get(&n).map(|v| v.id.clone()))
+        .collect();
+    let out = Out { doc, oklch, rem, formulas, roles: Roles::new(doc), in_colours, names: CssNames::new(doc), leading };
     let flattener = vars.flattener();
     let mut text = String::new();
     for c in colls {

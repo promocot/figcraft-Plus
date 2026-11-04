@@ -11,7 +11,7 @@
 </p>
 
 <p align="center">
-  <b>FigCraft Plus 13</b> · built on FigCraft <b>v0.14.0</b>, the latest official release ·
+  <b>FigCraft Plus 14</b> · built on FigCraft <b>v0.14.0</b>, the latest official release ·
   <code>.figcraft</code> files stay compatible with the official app, both ways
 </p>
 
@@ -33,8 +33,8 @@ the goal is a better FigCraft, not a different one.
 ### 🎨 Advanced color
 
 An **OKLCH picker** that shows the real gamut, **CMYK** fields, colors written as **CSS
-formulas**, *Copy as* any format, and a **WCAG + APCA contrast check** against what is really
-under the layer.
+formulas**, *Copy as* any format, gradients **blended in OKLCH**, a **WCAG + APCA contrast check**
+against what is really under the layer, and print-ready **PDF/X-4** at each frame's **DPI**.
 
 </td>
 <td width="33%" valign="top">
@@ -113,8 +113,11 @@ what you edit are offered.
 
 > ### 🗺 Roadmap — what's next
 >
-> **Next (on FigCraft 0.14):** line height in % and gradients as tokens · **print: a resolution (DPI) per frame** — switch a frame from 72 to 300 and it
-> scales with its content, without overlapping its neighbours · PDF/X.
+> **Just done (Plus 14):** line height in % from a variable · gradients blended in OKLCH ·
+> **a resolution (DPI) per frame** for print · PDF/X-4.
+>
+> **Next:** export presets (every size and format in one click) · design tokens (DTCG) import and
+> export.
 >
 > **[See the full roadmap →](ROADMAP.md)** · **[Ask for a feature →](../../issues/new?template=feature_request.yml)**
 > — the most 👍-ed requests move up.
@@ -150,6 +153,10 @@ what you edit are offered.
   - [Variables as CSS for code, and from CSS](#variables-as-css-for-code-and-from-css)
   - [Text styles together](#text-styles-together)
   - [Missing fonts: replace, and remember](#missing-fonts-replace-and-remember)
+  - [Line height in % from a variable](#line-height-in--from-a-variable)
+  - [Gradient tokens: gradients blended in OKLCH](#gradient-tokens-gradients-blended-in-oklch)
+  - [Resolution (DPI) per frame](#resolution-dpi-per-frame)
+  - [PDF/X-4 for print](#pdfx-4-for-print)
 - [Community](#community)
 - [FAQ](#faq)
 - [How it works](#how-it-works)
@@ -173,7 +180,7 @@ version; Plus goes further. Features FigCraft has since added itself are
 | [CMYK and Copy as in the colour picker](#cmyk-and-copy-as-in-the-colour-picker) | The picker offers Hex, RGB, HSL, HSB, LCH, OKLCH and CSS; CMYK exists only as a PDF export option. | **CMYK** fields in the picker, and **Copy as** — the colour in any format, one click. | 🟣 Exclusive |
 | [Contrast both ways: WCAG and APCA](#contrast-both-ways-wcag-and-apca) | No contrast check in the interface. | Under the picker's fields, two `Aa` samples — the colour on what is really under the layer, and that background on the colour — each with the WCAG ratio and level and the APCA Lc; the better pairing is marked. | 🟣 Exclusive |
 | [Colour variables in the picker: the Libraries tab](#colour-variables-in-the-picker-the-libraries-tab) | Colour variables are applied from the style menu next to Fill or Stroke; the picker itself only edits a colour. | A **Libraries** tab beside **Custom** in the colour picker: this file's and the enabled libraries' colour variables, with search — only those whose scope fits what you edit (a stroke offers stroke colours). | 🔵 Enhanced |
-| [FigCraft Plus preferences](#figcraft-plus-preferences) | The colour picker always opens in Hex; there are no units to choose. | Preferences ▸ FigCraft Plus: the layout and text units and root size for new files, decimals shown, the model the colour picker opens in, whether the picker follows the selection, the key object. | 🟣 Exclusive |
+| [FigCraft Plus preferences](#figcraft-plus-preferences) | The colour picker always opens in Hex; there are no units to choose. | Preferences ▸ FigCraft Plus: the layout and text units and root size for new files, decimals shown, the model the colour picker opens in, whether the picker follows the selection, the key object, the resolution of new frames. | 🟣 Exclusive |
 | [A better picker](#a-better-picker) | Fields without captions, one fixed width. | A caption over every field, a width that fits the model, and a draggable edge. | 🔵 Enhanced |
 | [A picker that stays with what you're editing](#a-picker-that-stays-with-what-youre-editing) | The picker opens beside the Design panel and closes when the selection changes. | It moves to the same slot of the newly selected layer, so you keep editing without reopening it; opened from a style dialog, it opens beside the dialog. | 🔵 Enhanced |
 | [Colours driven by number variables](#colours-driven-by-number-variables) | A colour can be bound to a colour variable as a whole. | Each channel (L, C, H, R, G, B, H, S, alpha…) can follow its own number variable: one `brand/hue` restyles every colour built on it. | 🟣 Exclusive |
@@ -189,6 +196,10 @@ version; Plus goes further. Features FigCraft has since added itself are
 | [Variables as CSS for code, and from CSS](#variables-as-css-for-code-and-from-css) | Variables export as CSS in hex and px (formulas flattened) and import from JSON. | **CSS for code:** `oklch()`, `rem`, relative colours, `color-mix()`, `calc()`; and **import CSS custom properties** — `:root` and theme blocks as modes. | 🔵 Enhanced |
 | [Text styles together](#text-styles-together) | Text styles are edited one at a time. | Select several: set font, size, line height, letter spacing for all; bind variables to all of them by name, previewed, one undo step. | 🟣 Exclusive |
 | [Missing fonts: replace, and remember](#missing-fonts-replace-and-remember) | Missing fonts are listed and the font store's ones downloaded. | **Replace…** with an installed font — every run and text style — remembered for the next file that uses it. | 🔵 Enhanced |
+| [Line height in % from a variable](#line-height-in--from-a-variable) | A number variable bound to the line height is pixels: one value for every text size. | The line height can follow a number variable **as a percentage** — `leading/normal = 140%` (or `1.4`) suits every size, as CSS writes it; layers and text styles, in every mode. | 🔵 Enhanced |
+| [Gradient tokens: gradients blended in OKLCH](#gradient-tokens-gradients-blended-in-oklch) | Gradient stops take colour variables; gradients mix their stops in sRGB (blue → yellow passes through grey). | **Blend · OKLCH** in the picker: the gradient — a layer's or a paint style's — is mixed in OKLCH between its stops and kept in step with their variables, as CSS's `linear-gradient(in oklch, …)`. | 🔵 Enhanced |
+| [Resolution (DPI) per frame](#resolution-dpi-per-frame) | A pixel is a point (72 per inch) everywhere. | Each top-level frame has its own **DPI**: 72 → 300 scales it and its contents so its size in mm stays, and moves what is beside it; mm, cm, in and pt follow it; PNG / JPG say their DPI and a PDF page keeps the physical size. | 🟣 Exclusive |
+| [PDF/X-4 for print](#pdfx-4-for-print) | A CMYK PDF with bleed, marks and page boxes, converted by formula, without an output intent. | **PDF/X-4** for coated FOGRA39 paper: the output intent with its ICC profile, colours converted through it, transparency in CMYK — what print shops' preflight asks for. | 🔵 Enhanced |
 | [Reorder variables: drag & drop and sorting](#reorder-variables-drag--drop-and-sorting) | Modes can be reordered; variables keep the order they were made in. | Drag variables, groups and collections, multi-select, Alt+↑/↓, and natural or by-value sorting — also as commands for scripts and MCP. | 🟣 Exclusive |
 
 Everything stays a normal `.figcraft` file: the official app opens it and sees the last computed
@@ -353,8 +364,9 @@ the files and keeps the last computed values.
   <img src="docs/images/41-number-variables.png" width="560" alt="The Variables editor: space/m (scoped to gap) reads 5.64mm, font/body (font size) 12pt, opacity/muted 0.6 and count 3 stay bare">
 - **em** for line height and letter spacing: `1.5em` is 150%, `0.02em` is 2% — relative to the
   font size, as in CSS, stored as FigCraft's percentage.
-- **Coming later:** `%`, `vw` and `vh` — sizes relative to the parent frame
-  ([roadmap](ROADMAP.md)).
+- `%`, `vw` and `vh` in W / H: see [Responsive layout](#responsive-layout-vw-vh-and-layout-from-variables).
+- A frame made for print reads mm, cm, in and pt at **its own resolution**: see
+  [Resolution (DPI) per frame](#resolution-dpi-per-frame).
 
 <img src="docs/images/31-print-units.png" width="508" alt="Typing 210mm in W; after Enter the frame is 595.28 × 841.89 — an A4 page">
 
@@ -427,7 +439,7 @@ the files and keeps the last computed values.
 >
 > **FigCraft Plus:** **Preferences ▸ FigCraft Plus**: the layout and text units and the root size for new files, and the model the colour picker opens in.
 
-<img src="docs/images/37-preferences.png" width="440" alt="Preferences ▸ FigCraft Plus: layout unit, text unit, default root size, decimals shown, the model the colour picker opens in, Picker follows the selection, Key object for aligning">
+<img src="docs/images/37-preferences.png" width="440" alt="Preferences ▸ FigCraft Plus: layout unit, text unit, default root size, decimals shown, the model the colour picker opens in, Picker follows the selection, Key object for aligning, Resolution of new frames 72 dpi">
 
 | Setting | What it does |
 |---|---|
@@ -437,6 +449,8 @@ the files and keeps the last computed values.
 | **Decimals shown** — 0 to 4 | How many decimals fields show; values keep every digit |
 | **Colour picker opens in** — Hex, RGB, HSL, HSB, LCH, OKLCH, CMYK or CSS | The model the picker shows when it opens |
 | **Picker follows the selection** — on by default | Clicking another layer keeps the colour picker open on the same fill, stroke or effect; off, it closes as FigCraft's |
+| **Key object for aligning** — on by default | A click on one layer of a selection makes it the one the others align to |
+| **Resolution of new frames** — 72 by default | The DPI new top-level frames are made at: 72 for the web, 300 for print |
 
 They are saved in `figcraft-plus.json` next to `figcraft.exe`, so a copy on a USB drive keeps them.
 
@@ -824,6 +838,88 @@ in exports. That fixes imports that arrive in the wrong order (`n-xs, n-6xl, n-s
   same replacement as it opens, with a note. **Preferences ▸ FigCraft Plus** lists the remembered
   ones; × forgets one.
 
+### Line height in % from a variable
+
+**🔵 Enhanced** — better in FigCraft Plus
+
+> **FigCraft:** A number variable bound to the line height is pixels — `leading = 24` gives every text 24 px, whatever its size.
+>
+> **FigCraft Plus:** The line height can follow a number variable as a **percentage of the font size**, as CSS writes it: `leading/normal = 140%` suits every size.
+
+<img src="docs/images/49-line-height-percent.png" width="560" alt="The line height's variable list with the px | % switch on %: leading/tight 120%, normal 140%, relaxed 160%; the field reads 140% normal">
+
+- Hover the line height field, click the variable button, and pick **%** in the *Line height in px | %*
+  switch under the search — the list then shows each variable as a percentage. The field shows its
+  chip, `140% normal`; a click on it picks another, its detach button keeps the value.
+- A value up to 5 is a ratio, as a unitless CSS `line-height`: `1.4` is 140%. Above, a percentage.
+- Text layers and **text styles** (the style dialog's line height) take it; the layers using a
+  style follow it. Modes switch it (tight leading on Mobile, relaxed on Desktop).
+- Typing a line height, or binding a variable the px way, ends it. **CSS for code** writes these
+  variables as ratios (`--leading-normal: 1.4`), ready for `line-height: var(--leading-normal)`.
+- The file keeps a plain percentage; which variable it follows is text the official app ignores.
+
+### Gradient tokens: gradients blended in OKLCH
+
+**🔵 Enhanced** — better in FigCraft Plus
+
+> **FigCraft:** Gradient stops can take colour variables; the gradient mixes them in sRGB, so blue → yellow passes through grey.
+>
+> **FigCraft Plus:** **Blend · OKLCH**: the gradient is mixed in OKLCH between its stops — the colours stay alive — and follows their variables. A paint style with it is a gradient token.
+
+<img src="docs/images/50-gradient-oklch.png" width="640" alt="The same blue → yellow gradient twice: blended in sRGB it goes grey in the middle; blended in OKLCH it passes through teal and green. The picker shows Blend · sRGB | OKLCH under the stop actions">
+
+- In a gradient's colour picker, under *Remove stop · Flip · Rotate 90°*: **Blend · sRGB | OKLCH**.
+  Works for fills and strokes, and for paint styles — make the gradient a style, bind its stops to
+  your palette, and every layer using it follows the palette and its modes.
+- In OKLCH, Plus places small steps between each two of your stops, mixed in OKLCH the way CSS's
+  `linear-gradient(in oklch, …)` does (the shorter way round the hue). The picker's bar and the
+  canvas show only your stops; add, move or remove them as usual, and the steps follow.
+- Back to sRGB, only your stops stay. The file keeps plain stops, which the official app draws as
+  they are.
+
+### Resolution (DPI) per frame
+
+**🟣 Exclusive** — only in FigCraft Plus (for now)
+
+> **FigCraft:** A pixel is a point: 72 per inch, everywhere.
+>
+> **FigCraft Plus:** Each top-level frame has its own resolution. Start a flyer at 72, switch it to 300: it scales, content and all, and stays 210 × 297 mm.
+
+<img src="docs/images/51-frame-resolution.png" width="720" alt="An A4 flyer at 300 DPI: W 210 mm, H 297 mm in Layout, Resolution 300 dpi with its presets menu open (72 · web, 96, 150, 300 · print, 600); the frame beside it has moved aside">
+
+- **Layout ▸ Resolution** of a top-level frame: type it or pick 72 · web, 96, 150, 300 · print,
+  600. The frame and everything in it scale by the ratio (72 → 300: × 4.17) from its top-left
+  corner, so its size in mm stays — A4 is now 2480 × 3508 px. **What is to its right and below it
+  moves by as much as it grew**, so nothing overlaps; back to 72, everything returns.
+- **mm, cm, in and pt** are read at the selection's frame resolution: the fields, the rulers, the
+  measurements, Dev Mode; `210mm` typed in a 300 DPI frame is 2480 px.
+- **Exports keep it:** a PNG or JPG of the frame says its DPI (300, or 600 at 2x), and a PDF page
+  has the frame's physical size, not its pixel size.
+- **Preferences ▸ FigCraft Plus ▸ Resolution of new frames**: 300 if you mostly print.
+- The file stays plain px; the resolution is text the official app ignores.
+
+### PDF/X-4 for print
+
+**🔵 Enhanced** — better in FigCraft Plus
+
+> **FigCraft:** The print PDF has bleed, crop and bleed marks, page boxes and CMYK colour — converted by formula, with no output intent.
+>
+> **FigCraft Plus:** **PDF/X-4** for coated FOGRA39 paper: the file a print shop's preflight expects.
+
+<img src="docs/images/52-pdfx.png" width="222" alt="A PDF export setting's print options: 8.5 pt bleed, crop marks, CMYK colour, and PDF/X-4 (coated FOGRA39) ticked">
+
+- In a PDF export's print options, under **CMYK colour**: **PDF/X-4 (coated FOGRA39)**. Every
+  CMYK PDF of the file is then PDF/X-4:
+  - an **output intent** for coated FOGRA39 (ISO 12647-2, the usual condition for sheet-fed
+    offset on coated paper) with its **ICC profile** embedded;
+  - colours and images **converted through that profile** (relative colorimetric), not by formula;
+  - transparency **blended in CMYK**, a trim box on every page, `PDF/X-4` and *not trapped* in the
+    metadata.
+- The profile is `craft-coated-fogra39.icc` from storytold's craft-libs (MIT or Apache-2.0), built
+  from the FOGRA39 characterisation data. Ask your print shop which condition it prints to; for
+  another one, convert in your RIP or preflight tool.
+- The choice is kept in the file as text the official app ignores; it exports FigCraft's own PDF.
+
 ## Community
 
 FigCraft Plus grows from what its users need. Every way to take part:
@@ -931,5 +1027,7 @@ move it to *Now in FigCraft itself* above and bump `CUSTOM_VERSION`.
 
 ## License
 
-FigCraft is MIT OR Apache-2.0; these additions are offered under the same terms. Not affiliated
-with the ArtCraft team. FigCraft is a trademark of its owners.
+FigCraft is MIT OR Apache-2.0; these additions are offered under the same terms. The coated
+FOGRA39 ICC profile used for PDF/X (`overlay/crates/pdf/src/craft-coated-fogra39.icc`) is
+craft-cms's, from [storytold/craft-libs](https://github.com/storytold/craft-libs), also MIT OR
+Apache-2.0. Not affiliated with the ArtCraft team. FigCraft is a trademark of its owners.

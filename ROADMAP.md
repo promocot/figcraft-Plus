@@ -21,30 +21,13 @@ Everything below serves one of them.
 | **2** | ✅ done in Plus 11 | Design system ↔ code |
 | **3** | ✅ done in Plus 11 | Design System Inspector |
 | **4** | ✅ done in Plus 12 | Responsive layout |
-| **5** | now, on FigCraft 0.14 | Web typography and colour tokens |
-| **6** | on FigCraft 0.14 | Print: resolution per frame, PDF/X |
-| — | later | Export presets, design tokens exchange |
+| **5** | ✅ done in Plus 14 | Web typography and colour tokens |
+| **6** | ✅ done in Plus 14 | Print: resolution per frame, PDF/X |
+| ▶ | next | Export presets, design tokens exchange |
 
 ---
 
-## ▶ Stage 5 — now, on FigCraft 0.14: web typography and colour tokens
-
-| | Feature | What it gives you |
-|---|---|---|
-| ⬜ | **Line height in % from a variable** — `leading/normal = 140%` follows each text's size | Tight / Normal / Relaxed as tokens, as CSS writes them |
-| ⬜ | **Gradient tokens** — a gradient style built from colour variables, with stops interpolated in OKLCH; change the palette and every gradient follows | Gradients become part of the design system (no new file format: a style with bound stops) |
-
-## 🖨 Stage 6 — on FigCraft 0.14: print
-
-*For print work: a frame knows the resolution it is made for, so a layout started for the screen
-can become a print file without being rebuilt.*
-
-| | Feature | What it gives you |
-|---|---|---|
-| ⬜ | **Resolution (DPI / PPI) per frame** — each top-level frame has its own: 72 for the web by default, 300 (or any value) for print. Set it in the frame's properties; the default for new frames in **Preferences ▸ FigCraft Plus**. Changing it **scales the frame and everything inside it** (72 → 300: ×4.17), so its physical size stays the same — a 210 × 297 mm page stays 210 × 297 mm, now 2480 × 3508 px. The frame grows from its top-left corner and **frames beside it move aside, so nothing overlaps**. Lengths in mm, cm, in and pt are read at the frame's own resolution, and exports render at it | Start in 72, finish in 300: one frame switches to print resolution, content and all, without touching the rest of the canvas. Files stay plain px for the official app (the resolution is kept as text it ignores) |
-| ⬜ | **PDF/X for print** — an output intent with an ICC profile on top of FigCraft's print PDF (bleed, marks and CMYK are already FigCraft's) | Files a print shop accepts as they are |
-
-## 📦 Later
+## 📦 Next
 
 | | Feature | What it gives you |
 |---|---|---|
@@ -80,6 +63,7 @@ Full details in the [changelog](CHANGELOG.md).
 
 | Release | Highlights |
 |---|---|
+| **Plus 14** | **Line height in % from a variable** · **gradients blended in OKLCH** (gradient tokens) · **resolution (DPI) per frame** · **PDF/X-4** for coated FOGRA39 |
 | **Plus 13** | Fixes: the picker beside a colour style's dialog again; contrast samples one under the other in a narrow picker |
 | **Plus 12** | On FigCraft 0.14.0 · **sizes in %, vw and vh** that follow the parent or the viewport frame · **auto layout from variables** (direction, wrap, alignment, sizing per mode) · **align to a key object** |
 | **Plus 11** | **CSS for code** (oklch, rem, relative colours, `color-mix()`, `calc()`) and **CSS import** · several text styles at once, variables bound by name · remembered missing-font replacements · the **Design System Inspector** |

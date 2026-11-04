@@ -1,0 +1,68 @@
+[
+  {
+    "note": "engine: line height from a variable (%) and OKLCH gradient modules",
+    "file": "crates/engine/src/lib.rs",
+    "after": "^pub mod \\w+;$",
+    "insert": "pub mod leading;\npub mod gradient_oklch;"
+  },
+  {
+    "note": "engine: register the line height variable and gradient blend commands",
+    "file": "crates/engine/src/cmd.rs",
+    "after": "^\\s*list\\.extend\\(variables_io::specs\\(\\)\\);$",
+    "insert": "        list.extend(crate::leading::specs());\n        list.extend(crate::gradient_oklch::specs());"
+  },
+  {
+    "note": "engine: line heights and OKLCH gradients follow their variables after every edit",
+    "file": "crates/engine/src/derived.rs",
+    "find": "    crate::responsive::resolve(doc, before, &touched);\n    touched.extend(doc.take_dirty());\n",
+    "replace": "    crate::responsive::resolve(doc, before, &touched);\n    touched.extend(doc.take_dirty());\n    // FigCraft Plus: line heights in % from number variables.\n    crate::leading::resolve(doc, before, &touched);\n    touched.extend(doc.take_dirty());\n    // FigCraft Plus: gradients blended in OKLCH.\n    crate::gradient_oklch::resolve(doc, before, &touched);\n    touched.extend(doc.take_dirty());\n"
+  },
+  {
+    "note": "ui: line height from a variable (%) module",
+    "file": "crates/ui-egui/src/lib.rs",
+    "after": "^pub mod windows;$",
+    "insert": "mod leading_ui;"
+  },
+  {
+    "note": "ui: OKLCH gradients module",
+    "file": "crates/ui-egui/src/lib.rs",
+    "after": "^pub mod windows;$",
+    "insert": "mod gradient_oklch_ui;"
+  },
+  {
+    "note": "colour picker: the gradient bar shows the key stops (OKLCH steps aren't yours to drag)",
+    "file": "crates/ui-egui/src/widgets/colorpicker.rs",
+    "find": "    for (i, s) in g.stops.clone().iter().enumerate() {\n        let x = bar.min.x + s.position * bar.width();\n",
+    "replace": "    for (i, s) in g.stops.clone().iter().enumerate() {\n        // FigCraft Plus: an OKLCH gradient's steps are the engine's.\n        if crate::gradient_oklch_ui::is_step(app, target, &g, i) {\n            continue;\n        }\n        let x = bar.min.x + s.position * bar.width();\n"
+  },
+  {
+    "note": "colour picker: Blend · sRGB | OKLCH under the stop actions",
+    "file": "crates/ui-egui/src/widgets/colorpicker.rs",
+    "find": "            paint.kind = PaintKind::Gradient(g.clone());\n            write(app, target, paint, false);\n        }\n    });\n    // The selected stop's colour can come from a colour variable.\n",
+    "replace": "            paint.kind = PaintKind::Gradient(g.clone());\n            write(app, target, paint, false);\n        }\n    });\n    // FigCraft Plus: the gradient blends in sRGB or in OKLCH.\n    crate::gradient_oklch_ui::row(app, ui, target, w);\n    // The selected stop's colour can come from a colour variable.\n"
+  },
+  {
+    "note": "canvas: an OKLCH gradient shows its key stops",
+    "file": "crates/ui-egui/src/canvas/handles.rs",
+    "find": "    for (i, s) in g.stops.iter().enumerate() {\n        let p = a + (b - a) * s.position;\n",
+    "replace": "    for (i, s) in g.stops.iter().enumerate() {\n        // FigCraft Plus: an OKLCH gradient's steps are the engine's.\n        if crate::gradient_oklch_ui::canvas_step(app, id, g, i) {\n            continue;\n        }\n        let p = a + (b - a) * s.position;\n"
+  },
+  {
+    "note": "typography: a line height following a variable in % shows its chip",
+    "file": "crates/ui-egui/src/panels/typography/spacing.rs",
+    "find": "    let rect = Rect::from_min_size(ui.cursor().min, vec2(width, FIELD_H));\n    if !range && crate::variable_ui::bound_chip(app, ui, ids, f.field, VariableType::Number, rect) {\n",
+    "replace": "    let rect = Rect::from_min_size(ui.cursor().min, vec2(width, FIELD_H));\n    // FigCraft Plus: a line height following a variable in % (`leading_ui`).\n    if !range && f.field == crate::leading_ui::FIELD && crate::leading_ui::layer_chip(app, ui, ids, rect) {\n        ui.allocate_rect(rect, Sense::hover());\n        return None;\n    }\n    if !range && crate::variable_ui::bound_chip(app, ui, ids, f.field, VariableType::Number, rect) {\n"
+  },
+  {
+    "note": "English: line height in %, gradient blend",
+    "file": "crates/ui-egui/locales/en.toml",
+    "after": "^\"Search fonts\" = ",
+    "insert": "\"Line height in\" = \"Line height in\"\n\"How the gradient mixes its colours between two stops: sRGB as drawn by default, or OKLCH, as CSS writes linear-gradient(in oklch, …)\" = \"How the gradient mixes its colours between two stops: sRGB as drawn by default, or OKLCH, as CSS writes linear-gradient(in oklch, …)\""
+  },
+  {
+    "note": "Russian: line height in %, gradient blend",
+    "file": "crates/ui-egui/locales/ru.toml",
+    "after": "^\"Search fonts\" = ",
+    "insert": "\"Line height in\" = \"Межстрочный в\"\n\"How the gradient mixes its colours between two stops: sRGB as drawn by default, or OKLCH, as CSS writes linear-gradient(in oklch, …)\" = \"Как градиент смешивает цвета между двумя точками: sRGB, как он рисуется по умолчанию, или OKLCH — как в CSS linear-gradient(in oklch, …)\""
+  }
+]

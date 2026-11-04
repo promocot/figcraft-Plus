@@ -282,6 +282,8 @@ fn body(ui: &mut Ui, t: &Tokens, id: Id, st: &mut State, items: &[Item], current
     } else if !crate::a11y::field_focused(ui.ctx()) {
         r.request_focus();
     }
+    // FigCraft Plus: a line height binds in px or in %.
+    crate::leading_ui::switch(ui, w);
     // The library filter, when variables come from more than one place.
     if libs.len() > 1 {
         filter_row(ui, t, id, st, &libs, w);
@@ -420,6 +422,7 @@ fn row(ui: &Ui, t: &Tokens, r: Rect, it: &Item, on: bool) {
     }
     let value = match &it.value {
         Some(VariableValue::Color(c)) => c.to_hex().trim_start_matches('#').to_uppercase(),
+        Some(VariableValue::Number(x)) if crate::leading_ui::percent_rows() => crate::leading_ui::row_value(*x),
         Some(VariableValue::Number(x)) => crate::units_ui::list_number(*x),
         Some(v) => v.display(),
         None => String::new(),
@@ -551,7 +554,13 @@ pub(crate) fn apply(app: &mut FigApp, target: &Target, pick: &Pick) {
 pub(crate) fn picker(app: &mut FigApp, ctx: &egui::Context) {
     let Some(p) = ctx.data(|d| d.get_temp::<Picker>(variable_ui::picker_id())) else { return };
     let Ok(doc) = app.session.ds().map(|d| d.doc.clone()) else { return };
-    let (items, current) = offered(app, &doc, &p.target, p.kind);
+    // A line height binds in px (FigCraft's way) or in % (`leading_ui`).
+    let percent = crate::leading_ui::begin(ctx, &doc, &p.target) == Some(true);
+    let (mut items, mut current) = offered(app, &doc, &p.target, p.kind);
+    if percent {
+        items.retain(|it| it.pick.library.is_none());
+        current = crate::leading_ui::current(&doc, &p.target);
+    }
     let empty = match p.kind {
         Some(VariableType::Color) => tr("No colour variables fit here."),
         Some(VariableType::Number) => tr("No number variables fit here."),
@@ -562,6 +571,7 @@ pub(crate) fn picker(app: &mut FigApp, ctx: &egui::Context) {
     let id = Id::unique("figcraftplus_variable_picker");
     let close = |ctx: &egui::Context| {
         ctx.data_mut(|d| d.remove::<Picker>(variable_ui::picker_id()));
+        crate::leading_ui::end(ctx);
         crate::popover_ui::forget_selection(ctx, id);
     };
     // A change of selection closes it, like every popover.
@@ -577,13 +587,20 @@ pub(crate) fn picker(app: &mut FigApp, ctx: &egui::Context) {
     });
     let outcome = card(ctx, id, p.at, tr("Variables"), &items, current.as_ref(), empty);
     crate::units_ui::list_for(None);
+    // The switch may have changed the mode this frame: what a pick does follows it.
+    let percent = crate::leading_ui::percent_rows();
+    crate::leading_ui::frame_done();
     match outcome {
         Outcome::Open => {}
         Outcome::Close => close(ctx),
         Outcome::Pick(i) => {
             close(ctx);
             let Some(pick) = items.get(i).map(|it| it.pick.clone()) else { return };
-            apply(app, &p.target, &pick);
+            if percent {
+                crate::leading_ui::apply(app, &p.target, &pick);
+            } else {
+                apply(app, &p.target, &pick);
+            }
         }
     }
 }

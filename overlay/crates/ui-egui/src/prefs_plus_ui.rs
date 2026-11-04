@@ -44,11 +44,13 @@ pub(crate) struct Prefs {
     pub font_replacements: std::collections::BTreeMap<String, String>,
     /// A click on a layer of a multi-selection makes it the key object the others align to.
     pub key_object: bool,
+    /// The resolution (DPI) new top-level frames are made at.
+    pub dpi: f64,
 }
 
 impl Default for Prefs {
     fn default() -> Self {
-        Prefs { rem: false, text: String::new(), layout_unit: "px".into(), root: 16.0, color_model: "Hex".into(), precision: 2, picker_follows_selection: true, font_replacements: Default::default(), key_object: true }
+        Prefs { rem: false, text: String::new(), layout_unit: "px".into(), root: 16.0, color_model: "Hex".into(), precision: 2, picker_follows_selection: true, font_replacements: Default::default(), key_object: true, dpi: 72.0 }
     }
 }
 
@@ -171,14 +173,13 @@ pub(crate) fn preferences(ui: &mut Ui) {
     widgets::label(ui, tr("Applies to new documents. Each file stores its own units and root size."), t.text_secondary);
     ui.add_space(4.0);
     ui.horizontal(|ui| {
-        ui.label(tr("Decimals shown"));
+        ui.label(tr("Decimals shown")).on_hover_text(tr("Fields round what they show; values keep every digit."));
         const DIGITS: [&str; 5] = ["0", "1", "2", "3", "4"];
         let now = DIGITS[usize::from(p.precision.min(4))];
         if let Some(d) = unit_menu(ui, now, &DIGITS) {
             set(|p| p.precision = d.parse().unwrap_or(2));
         }
     });
-    widgets::label(ui, tr("Fields round what they show; values keep every digit."), t.text_secondary);
     ui.add_space(4.0);
     ui.horizontal(|ui| {
         ui.label(tr("Colour picker opens in"));
@@ -193,15 +194,31 @@ pub(crate) fn preferences(ui: &mut Ui) {
         });
     });
     ui.add_space(4.0);
-    if widgets::checkbox(ui, p.picker_follows_selection, tr("Picker follows the selection")) {
-        set(|p| p.picker_follows_selection = !p.picker_follows_selection);
-    }
-    widgets::label(ui, tr("The colour picker stays open on the same fill, stroke or effect of the layers you select next. Off: it closes, as in FigCraft."), t.text_secondary);
+    // The explanation on hover keeps the section short enough for the window.
+    ui.scope(|ui| {
+        if widgets::checkbox(ui, p.picker_follows_selection, tr("Picker follows the selection")) {
+            set(|p| p.picker_follows_selection = !p.picker_follows_selection);
+        }
+    })
+    .response
+    .on_hover_text(tr("The colour picker stays open on the same fill, stroke or effect of the layers you select next. Off: it closes, as in FigCraft."));
     ui.add_space(4.0);
-    if widgets::checkbox(ui, p.key_object, tr("Key object for aligning")) {
-        set(|p| p.key_object = !p.key_object);
-    }
-    widgets::label(ui, tr("With several layers selected, click one: the others align to it. Click it again to select just it."), t.text_secondary);
+    // The explanation on hover keeps the section short enough for the window.
+    ui.scope(|ui| {
+        if widgets::checkbox(ui, p.key_object, tr("Key object for aligning")) {
+            set(|p| p.key_object = !p.key_object);
+        }
+    })
+    .response
+    .on_hover_text(tr("With several layers selected, click one: the others align to it. Click it again to select just it."));
+    ui.horizontal(|ui| {
+        ui.label(tr("Resolution of new frames")).on_hover_text(tr("72 for the web; 300 for print. Each frame keeps its own, in Layout."));
+        if let Some(FieldEdit::Set(v) | FieldEdit::Scrub(v, true)) =
+            widgets::number_field(ui, Id::unique("figcraftplus_pref_dpi"), Lead::None, Some(p.dpi), " dpi", 80.0, 1.0)
+        {
+            set(|p| p.dpi = v.clamp(figcraft_engine::dpi::MIN, figcraft_engine::dpi::MAX));
+        }
+    });
     if !p.font_replacements.is_empty() {
         ui.add_space(6.0);
         ui.label(egui::RichText::new(tr("Remembered font replacements")).font(regular(11.0)).color(t.text));

@@ -138,7 +138,7 @@ pub(crate) fn open_edit(app: &mut FigApp, ctx: &egui::Context, id: &str, y: f32)
     let Some(st) = app.session.doc().ok().and_then(|d| d.style(id)).cloned() else { return };
     put(
         ctx,
-        Some(Dialog { style: st.id, creating: false, name: st.name, description: st.description, open: None, y, more: false, focus_name: false }),
+        Some(Dialog { style: st.id, creating: false, name: st.name, description: figcraft_engine::leading::without_rule(&st.description), open: None, y, more: false, focus_name: false }),
     );
 }
 
@@ -207,6 +207,14 @@ fn bindable(
     control: impl FnOnce(&mut FigApp, &mut Ui),
 ) {
     let area = Rect::from_min_size(ui.cursor().min, vec2(width, widgets::FIELD_H));
+    // FigCraft Plus: a line height following a variable in %.
+    if field == crate::leading_ui::FIELD {
+        let r = Rect::from_min_size(area.min, area.size());
+        if crate::leading_ui::style_chip(app, ui, doc, &st.id, r) {
+            ui.allocate_exact_size(area.size(), Sense::hover());
+            return;
+        }
+    }
     if let Some(name) = bound(doc, st, field) {
         let (r, _) = ui.allocate_exact_size(area.size(), Sense::hover());
         match widgets::bound_field(ui, Id::unique(("sd_chip", &st.id, field)), Lead::None, r, &name) {
@@ -266,8 +274,10 @@ pub(crate) fn show(app: &mut FigApp, ctx: &egui::Context) {
         labelled(ui, tr("Description"), &t, |ui| {
             let r = ui
                 .add(egui::TextEdit::singleline(&mut d.description).hint_text(tr("What it's for")).font(regular(11.0)).desired_width(W - 112.0));
-            if !d.creating && r.lost_focus() && d.description != st.description {
-                app.run("style.update", json!({"style": st.id, "description": d.description}));
+            // FigCraft Plus: the line-height variable's line stays out of sight and in place.
+            let description = figcraft_engine::leading::keep_rule(&d.description, &st.description);
+            if !d.creating && r.lost_focus() && description != st.description {
+                app.run("style.update", json!({"style": st.id, "description": description}));
             }
         });
         ui.add_space(6.0);
@@ -353,7 +363,7 @@ pub(crate) fn show(app: &mut FigApp, ctx: &egui::Context) {
     }
     if create {
         let name = d.name.trim().to_string();
-        let mut p = json!({"style": st.id, "description": d.description});
+        let mut p = json!({"style": st.id, "description": figcraft_engine::leading::keep_rule(&d.description, &st.description)});
         if !name.is_empty() {
             p["name"] = json!(name);
         }
