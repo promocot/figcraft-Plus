@@ -23,7 +23,6 @@
 
 use std::cell::Cell;
 use std::collections::HashMap;
-use std::sync::atomic::{AtomicUsize, Ordering};
 
 use egui::{Align2, CornerRadius, Id, Rect, Sense, Ui, pos2};
 use figcraft_doc::Document;
@@ -40,8 +39,12 @@ pub(crate) const LAYOUT_UNITS: [&str; 6] = ["px", "rem", "mm", "cm", "in", "pt"]
 /// The units text fields can show.
 pub(crate) const TEXT_UNITS: [&str; 3] = ["px", "rem", "pt"];
 
-static LAYOUT: AtomicUsize = AtomicUsize::new(0);
-static TEXT: AtomicUsize = AtomicUsize::new(0);
+thread_local! {
+    // The chosen units (indexes into the lists above). Per thread: the UI has one, and tests run
+    // side by side without changing each other's units.
+    static LAYOUT: Cell<usize> = const { Cell::new(0) };
+    static TEXT: Cell<usize> = const { Cell::new(0) };
+}
 
 /// What a number field measures.
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
@@ -92,18 +95,18 @@ pub(crate) fn doc_text(doc: &Document) -> &'static str {
 /// Each frame: the open file's units.
 pub(crate) fn tick(doc: Option<&Document>) {
     let (l, t) = doc.map(|d| (doc_layout(d), doc_text(d))).unwrap_or(("px", "px"));
-    LAYOUT.store(pick(&LAYOUT_UNITS, l).unwrap_or(0), Ordering::Relaxed);
-    TEXT.store(pick(&TEXT_UNITS, t).unwrap_or(0), Ordering::Relaxed);
+    LAYOUT.set(pick(&LAYOUT_UNITS, l).unwrap_or(0));
+    TEXT.set(pick(&TEXT_UNITS, t).unwrap_or(0));
 }
 
 /// The layout unit now.
 pub(crate) fn layout() -> &'static str {
-    LAYOUT_UNITS[LAYOUT.load(Ordering::Relaxed).min(LAYOUT_UNITS.len() - 1)]
+    LAYOUT_UNITS[LAYOUT.get().min(LAYOUT_UNITS.len() - 1)]
 }
 
 /// The text unit now.
 pub(crate) fn text() -> &'static str {
-    TEXT_UNITS[TEXT.load(Ordering::Relaxed).min(TEXT_UNITS.len() - 1)]
+    TEXT_UNITS[TEXT.get().min(TEXT_UNITS.len() - 1)]
 }
 
 /// px in one layout unit now.
@@ -119,8 +122,8 @@ pub(crate) fn text_k() -> f64 {
 /// For tests: set the units.
 #[cfg(test)]
 pub(crate) fn set_for_test(layout: &str, text: &str) {
-    LAYOUT.store(pick(&LAYOUT_UNITS, layout).unwrap_or(0), Ordering::Relaxed);
-    TEXT.store(pick(&TEXT_UNITS, text).unwrap_or(0), Ordering::Relaxed);
+    LAYOUT.set(pick(&LAYOUT_UNITS, layout).unwrap_or(0));
+    TEXT.set(pick(&TEXT_UNITS, text).unwrap_or(0));
 }
 
 // ---- which fields are lengths -------------------------------------------------------------------

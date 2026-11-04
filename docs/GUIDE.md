@@ -173,7 +173,7 @@ Picking one switches the **file's** layout unit (every field), not one property.
 
 ### 12. Rulers and Dev Mode in the file's unit
 
-**Try it.** Units › Layout mm. View › Rulers (Shift+R). Then Dev Mode (the `</>` toggle in the
+**Try it.** Units › Layout mm. Rulers on (**Shift+R**, or right-click the canvas › Rulers). Then Dev Mode (the `</>` toggle in the
 toolbar) and select a layer.
 
 **You should see.** Rulers count round mm (0, 20, 40…); guides show mm. Dev Mode lists the
@@ -199,8 +199,8 @@ the parent's padding is left out.
 children (Shift+A). Layout › the variable button at the end of the direction row › **Direction ›
 card/direction**.
 
-**You should see.** The frame is a row. Set the frame's mode (Appearance › the mode switch) to
-Mobile: it becomes a column. Also wrap, main and cross alignment, W / H sizing.
+**You should see.** The frame is a row. In the frame's **Variable modes** section (Design panel) set `Layout`
+to Mobile: it becomes a column. Also wrap, main and cross alignment, W / H sizing.
 
 ### 15. Align to a key object
 
@@ -382,7 +382,7 @@ an *In this file* section).
 
 ### 33. Missing fonts: replace, and remember
 
-**Try it.** Open a file using a font you don't have. Text › **Missing fonts** › **Replace…** › pick
+**Try it.** Open a file using a font you don't have. Main menu › Text › **Missing fonts…** › **Replace…** › pick
 an installed font; tick *Remember replacements for other files*.
 
 **You should see.** Every run and text style with that font switches; the next file with it is

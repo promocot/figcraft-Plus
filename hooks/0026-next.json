@@ -24,12 +24,6 @@
     "replace": "    for (i, e) in list.iter().enumerate() {\n        setting_row(app, ui, &ids, i, e, text);\n    }\n    // FigCraft Plus: sizes, formats and a name pattern in one go.\n    crate::presets_ui::row(app, ui, doc, sel);\n    let Some(first) = first else { return };\n"
   },
   {
-    "note": "variables: Export ▸ Design tokens (DTCG)…",
-    "file": "crates/ui-egui/src/dialogs/variables_panel.rs",
-    "find": "        if menu_item(ui, tr(\"CSS for code…\"), \"\") {\n            crate::tokens_ui::open_export(ui.ctx());\n            ui.close();\n        }\n",
-    "replace": "        if menu_item(ui, tr(\"CSS for code…\"), \"\") {\n            crate::tokens_ui::open_export(ui.ctx());\n            ui.close();\n        }\n        if menu_item(ui, tr(\"Design tokens (DTCG)…\"), \"\") {\n            crate::tokens_ui::export_dtcg(app);\n            ui.close();\n        }\n"
-  },
-  {
     "note": "English: presets and DTCG",
     "file": "crates/ui-egui/locales/en.toml",
     "after": "^\"Search fonts\" = ",
