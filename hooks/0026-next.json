@@ -1,0 +1,38 @@
+[
+  {
+    "note": "engine: DTCG tokens and export presets modules",
+    "file": "crates/engine/src/cmd.rs",
+    "after": "^pub mod ds_inspect;$",
+    "insert": "pub mod dtcg;\npub mod export_presets;"
+  },
+  {
+    "note": "engine: register the DTCG and export preset commands",
+    "file": "crates/engine/src/cmd.rs",
+    "after": "^\\s*list\\.extend\\(ds_inspect::specs\\(\\)\\);$",
+    "insert": "        list.extend(dtcg::specs());\n        list.extend(export_presets::specs());"
+  },
+  {
+    "note": "ui: export presets module",
+    "file": "crates/ui-egui/src/lib.rs",
+    "after": "^pub mod windows;$",
+    "insert": "mod presets_ui;"
+  },
+  {
+    "note": "export: Presets… (sizes, formats and a name pattern in one go)",
+    "file": "crates/ui-egui/src/panels/export_panel.rs",
+    "find": "    for (i, e) in list.iter().enumerate() {\n        setting_row(app, ui, &ids, i, e, text);\n    }\n    let Some(first) = first else { return };\n",
+    "replace": "    for (i, e) in list.iter().enumerate() {\n        setting_row(app, ui, &ids, i, e, text);\n    }\n    // FigCraft Plus: sizes, formats and a name pattern in one go.\n    crate::presets_ui::row(app, ui, doc, sel);\n    let Some(first) = first else { return };\n"
+  },
+  {
+    "note": "English: presets and DTCG",
+    "file": "crates/ui-egui/locales/en.toml",
+    "after": "^\"Search fonts\" = ",
+    "insert": "\"Design tokens (DTCG)…\" = \"Design tokens (DTCG)…\"\n\"Presets…\" = \"Presets…\"\n\"Export with a preset: several sizes and formats, files named by a pattern\" = \"Export with a preset: several sizes and formats, files named by a pattern\"\n\"Save these settings as a preset\" = \"Save these settings as a preset\"\n\"Edit presets…\" = \"Edit presets…\"\n\"Preset\" = \"Preset\"\n\"Saved the preset\" = \"Saved the preset\"\n\"Export presets\" = \"Export presets\"\n\"Patterns: {name} {frame} {page} {w} {h} {scale} {format} {n} {date}; a / makes folders\" = \"Patterns: {name} {frame} {page} {w} {h} {scale} {format} {n} {date}; a / makes folders\""
+  },
+  {
+    "note": "Russian: presets and DTCG",
+    "file": "crates/ui-egui/locales/ru.toml",
+    "after": "^\"Search fonts\" = ",
+    "insert": "\"Design tokens (DTCG)…\" = \"Дизайн-токены (DTCG)…\"\n\"Presets…\" = \"Пресеты…\"\n\"Export with a preset: several sizes and formats, files named by a pattern\" = \"Экспорт по пресету: несколько размеров и форматов, имена файлов по шаблону\"\n\"Save these settings as a preset\" = \"Сохранить эти настройки как пресет\"\n\"Edit presets…\" = \"Изменить пресеты…\"\n\"Preset\" = \"Пресет\"\n\"Saved the preset\" = \"Пресет сохранён\"\n\"Export presets\" = \"Пресеты экспорта\"\n\"Patterns: {name} {frame} {page} {w} {h} {scale} {format} {n} {date}; a / makes folders\" = \"Шаблоны: {name} {frame} {page} {w} {h} {scale} {format} {n} {date}; / создаёт папки\""
+  }
+]

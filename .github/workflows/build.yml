@@ -112,6 +112,8 @@ jobs:
           cargo test --locked -p figcraft-engine --lib gradient_oklch
           cargo test --locked -p figcraft-engine --lib dpi
           cargo test --locked -p figcraft-engine --lib pdfx
+          cargo test --locked -p figcraft-engine --lib dtcg
+          cargo test --locked -p figcraft-engine --lib export_presets
           cargo test --locked -p figcraft-pdf --lib plus
           cargo test --locked -p figcraft-ui-egui --lib
 

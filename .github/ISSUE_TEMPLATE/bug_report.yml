@@ -1,16 +1,69 @@
-name: Bug in an add-on
-description: Something FigCraft Plus adds doesn't work as it should.
+name: Bug in a FigCraft Plus feature
+description: Something FigCraft Plus adds doesn't work as it should (only Plus's own features).
 title: "[Bug] "
 labels: ["bug"]
 body:
   - type: markdown
     attributes:
       value: |
-        Does the same happen in the official FigCraft too? Then it belongs in [FigCraft's tracker](https://github.com/storytold/figcraft/issues) — it will reach this build with their fix.
+        **Only FigCraft Plus's own features, please.** FigCraft Plus adds to FigCraft; it doesn't replace it. If the same happens in the **official FigCraft of the same version**, report it in [FigCraft's tracker](https://github.com/storytold/figcraft/issues): their fix reaches Plus with their next release, and Plus never patches FigCraft's own behaviour.
+
+        Each feature's steps and expected result are in the [guide](https://github.com/promocot/figcraft-Plus/blob/main/docs/GUIDE.md).
+  - type: dropdown
+    id: feature
+    attributes:
+      label: Which feature
+      options:
+        - "1 OKLCH picker"
+        - "2 CMYK and Copy as"
+        - "3 Contrast both ways"
+        - "4 Libraries tab in the colour picker"
+        - "5 The picker follows the selection"
+        - "6 Colour channels from number variables"
+        - "7 Derived colours and calculated variables"
+        - "8 Gradients blended in OKLCH"
+        - "9 Units per file"
+        - "10 The unit menu on a field"
+        - "11 Print units and em"
+        - "12 Rulers and Dev Mode in the file's unit"
+        - "13 Sizes in %, vw and vh"
+        - "14 Auto layout from variables"
+        - "15 Align to a key object"
+        - "16 Resolution (DPI) per frame"
+        - "17 Number variables with a unit"
+        - "18 The variable picker"
+        - "19 Variable details"
+        - "20 Reorder and sort variables"
+        - "21 Variables in text"
+        - "22 Line height in % from a variable"
+        - "23 Styles created in a dialog"
+        - "24 Style groups"
+        - "25 Text styles together"
+        - "26 Design System Inspector"
+        - "27 CSS for code"
+        - "28 Import CSS custom properties"
+        - "29 Design tokens (DTCG)"
+        - "30 Export presets"
+        - "31 PDF/X-4 for print"
+        - "32 Your own fonts folder"
+        - "33 Missing fonts: replace and remember"
+        - "34 FigCraft Plus preferences"
+        - "35 Files stay compatible"
+        - "Something else Plus adds"
+    validations:
+      required: true
+  - type: checkboxes
+    id: upstream
+    attributes:
+      label: Checked in the official FigCraft
+      options:
+        - label: I tried the same steps in the official FigCraft of the same version, and it doesn't happen there (or the feature isn't there).
+          required: true
   - type: textarea
     id: steps
     attributes:
       label: Steps
+      description: The guide's steps for the feature, and where you left them.
       placeholder: "1. …\n2. …"
     validations:
       required: true
@@ -18,13 +71,14 @@ body:
     id: expected
     attributes:
       label: What you expected, and what happened
+      description: Screenshots help.
     validations:
       required: true
   - type: input
     id: version
     attributes:
       label: FigCraft Plus version
-      placeholder: "FigCraft Plus 3 · FigCraft v0.12.1"
+      placeholder: "FigCraft Plus 15 · FigCraft v0.15.0"
     validations:
       required: true
   - type: input

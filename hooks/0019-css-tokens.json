@@ -6,10 +6,10 @@
     "insert": "mod tokens_ui;"
   },
   {
-    "note": "variables: Export ▸ CSS for code…",
+    "note": "variables: Export ▸ CSS for code… and Design tokens (DTCG)… (Plus 15)",
     "file": "crates/ui-egui/src/dialogs/variables_panel.rs",
     "find": "                export_dialog(app, format);\n                ui.close();\n            }\n        }\n    });\n",
-    "replace": "                export_dialog(app, format);\n                ui.close();\n            }\n        }\n        // FigCraft Plus: oklch(), rem and formulas, the way code writes them.\n        if menu_item(ui, tr(\"CSS for code…\"), \"\") {\n            crate::tokens_ui::open_export(ui.ctx());\n            ui.close();\n        }\n    });\n    crate::tokens_ui::export_popover(app, ui.ctx(), &export);\n"
+    "replace": "                export_dialog(app, format);\n                ui.close();\n            }\n        }\n        // FigCraft Plus: oklch(), rem and formulas, the way code writes them.\n        if menu_item(ui, tr(\"CSS for code…\"), \"\") {\n            crate::tokens_ui::open_export(ui.ctx());\n            ui.close();\n        }\n        if menu_item(ui, tr(\"Design tokens (DTCG)…\"), \"\") {\n            crate::tokens_ui::export_dtcg(app);\n            ui.close();\n        }\n    });\n    crate::tokens_ui::export_popover(app, ui.ctx(), &export);\n"
   },
   {
     "note": "variables: Import is a menu (variables JSON or CSS custom properties)",

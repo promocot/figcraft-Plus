@@ -7,6 +7,25 @@ Every FigCraft Plus release, newest first. Each one is built on an official FigC
 **🟣 Exclusive** — FigCraft has nothing like it yet. **🔵 Enhanced** — FigCraft has a basic
 version; Plus goes further.
 
+## Plus 15 · FigCraft v0.15.0 — 2026-11-04
+
+Every add-on carried over to FigCraft 0.15.0 (nothing it added duplicates Plus: its auto layout
+Fill / Hug, text list and shortcut changes sit beside Plus's own). The roadmap's "Next":
+
+- 🔵 **Export presets.** *Presets…* in the Export section: export the selected layers in several
+  sizes and formats at once, the files named by a pattern (`{name}_{w}x{h}`, `{frame}`, `{scale}`,
+  `{format}`, `{n}`, `{date}`; `/` makes folders). Four presets to start with; *Save these settings
+  as a preset*; rename, change the pattern and remove them in Preferences.
+- 🟣 **Design tokens (DTCG).** Variables ▸ Export / Import ▸ *Design tokens (DTCG)…*: the W3C
+  Design Tokens format — collections as groups, `$type` / `$value`, aliases as `{a.b}`, every mode
+  kept; tokens from other tools read too (colours, dimensions, numbers, font weights and families).
+- **Guide:** [`docs/GUIDE.md`](docs/GUIDE.md) — every feature step by step, with what you should
+  see. Bug reports now take only FigCraft Plus's own features (and point FigCraft's own issues to
+  FigCraft).
+
+Plus 14 was published on FigCraft 0.15.0 (the build takes the latest official release); its notes
+below say 0.14.0, where it was made and checked.
+
 ## Plus 14 · FigCraft v0.14.0 — 2026-11-04
 
 Roadmap stages 5 and 6.
