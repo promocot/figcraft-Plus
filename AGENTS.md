@@ -210,7 +210,28 @@ inside). Lessons learned:
 
 ## 8. Where things stand (update this section when you finish work)
 
-- **Released:** Plus 13 on FigCraft v0.14.0 (2026-11-02): fixes. The style dialog's swatch opens
+- **Released:** Plus 14 on FigCraft v0.14.0 (2026-11-04): roadmap stages 5 and 6.
+  - Engine `leading.rs`: line height in % from a number variable (layer data
+    `figcraftplus.lineHeight`, a text style's description line `lineHeight {name}`; ≤ 5 is a
+    ratio); commands `text.lineHeightVariable`, `style.lineHeightVariable`. UI `leading_ui.rs`: the
+    px | % switch in the variable picker (`var_picker_ui` calls `begin` / `switch` / `frame_done`),
+    the chip in Typography and the style dialog (which hides the rule line from its description).
+    CSS for code writes these variables as ratios.
+  - Engine `gradient_oklch.rs`: `fills/0 in oklch <key positions>` (layer data
+    `figcraftplus.gradients`, a paint style's description); 16 steps between keys, mixed in OKLCH;
+    stops that aren't steps are keys; bindings and stop formulas renumbered. Command
+    `gradient.blend`. UI `gradient_oklch_ui.rs` (Blend row; steps hidden on the bar and canvas).
+  - Engine `dpi.rs` (`figcraftplus.dpi` on top-level frames; `frame.resolution` scales with
+    `arrange::scale_node` and moves right / lower siblings; default for new frames; PNG `pHYs` /
+    JPEG JFIF density) and `pdfx.rs` (`figcraftplus.pdfx` on the first page; `print.pdfx`). The PDF
+    crate's `plus.rs` scales a frame's page by 72 / DPI and, for PDF/X-4, writes krilla's
+    output intent with craft-cms's `craft-coated-fogra39.icc` (copied into the overlay; MIT OR
+    Apache-2.0) and converts CMYK through it with moxcms (hooked into `print::cmyk_of`; the pdf
+    crate gains `moxcms`, and the hook edits `Cargo.lock` for `--locked`). UI `dpi_ui.rs`: Layout ▸
+    Resolution, the DPI lengths are read at (`units_ui::per`, `rem_ui::unit`), the PDF/X checkbox.
+  - Hooks 0024 (typography and colour tokens) and 0025 (print). Build with `CARGO_INCREMENTAL=0`
+    when the session disk is tight.
+- **Plus 13** on FigCraft v0.14.0 (2026-11-02): fixes. The style dialog's swatch opens
   the picker with `app.open_picker(target, Some(rect))` — setting `app.ui.picker` alone leaves
   `picker_button` empty, and `picker_place_ui::open` can't place it beside the dialog (test in
   `picker_follow_tests.rs`); the contrast samples stack below 2 × 132 px. README screenshots

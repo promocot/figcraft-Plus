@@ -44,11 +44,13 @@ pub(crate) struct Prefs {
     pub font_replacements: std::collections::BTreeMap<String, String>,
     /// A click on a layer of a multi-selection makes it the key object the others align to.
     pub key_object: bool,
+    /// The resolution (DPI) new top-level frames are made at.
+    pub dpi: f64,
 }
 
 impl Default for Prefs {
     fn default() -> Self {
-        Prefs { rem: false, text: String::new(), layout_unit: "px".into(), root: 16.0, color_model: "Hex".into(), precision: 2, picker_follows_selection: true, font_replacements: Default::default(), key_object: true }
+        Prefs { rem: false, text: String::new(), layout_unit: "px".into(), root: 16.0, color_model: "Hex".into(), precision: 2, picker_follows_selection: true, font_replacements: Default::default(), key_object: true, dpi: 72.0 }
     }
 }
 
@@ -202,6 +204,16 @@ pub(crate) fn preferences(ui: &mut Ui) {
         set(|p| p.key_object = !p.key_object);
     }
     widgets::label(ui, tr("With several layers selected, click one: the others align to it. Click it again to select just it."), t.text_secondary);
+    ui.add_space(4.0);
+    ui.horizontal(|ui| {
+        ui.label(tr("Resolution of new frames"));
+        if let Some(FieldEdit::Set(v) | FieldEdit::Scrub(v, true)) =
+            widgets::number_field(ui, Id::unique("figcraftplus_pref_dpi"), Lead::None, Some(p.dpi), " dpi", 80.0, 1.0)
+        {
+            set(|p| p.dpi = v.clamp(figcraft_engine::dpi::MIN, figcraft_engine::dpi::MAX));
+        }
+    });
+    widgets::label(ui, tr("72 for the web; 300 for print. Each frame keeps its own, in Layout."), t.text_secondary);
     if !p.font_replacements.is_empty() {
         ui.add_space(6.0);
         ui.label(egui::RichText::new(tr("Remembered font replacements")).font(regular(11.0)).color(t.text));

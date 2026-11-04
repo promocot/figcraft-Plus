@@ -7,6 +7,24 @@ Every FigCraft Plus release, newest first. Each one is built on an official FigC
 **🟣 Exclusive** — FigCraft has nothing like it yet. **🔵 Enhanced** — FigCraft has a basic
 version; Plus goes further.
 
+## Plus 14 · FigCraft v0.14.0 — 2026-11-04
+
+Roadmap stages 5 and 6.
+
+- 🔵 **Line height in % from a variable.** The line height's variable list has a **px | %**
+  switch: in %, the line height follows a number variable as a share of the font size —
+  `leading/normal = 140` (or `1.4`) suits every size, as CSS writes it. Text layers and text styles,
+  in every mode; CSS for code writes these variables as ratios.
+- 🔵 **Gradient tokens: blended in OKLCH.** *Blend · sRGB | OKLCH* in a gradient's picker: the
+  gradient (a layer's, or a paint style's) is mixed in OKLCH between its stops, as
+  `linear-gradient(in oklch, …)`, and follows their variables and modes.
+- 🟣 **Resolution (DPI) per frame.** *Layout ▸ Resolution* of a top-level frame (72 · web … 300 ·
+  print): changing it scales the frame and its contents so its size in mm stays, and moves what is
+  beside it so nothing overlaps. mm, cm, in and pt follow it; PNG and JPG say their DPI, a PDF page
+  keeps the physical size. *Preferences ▸ Resolution of new frames*.
+- 🔵 **PDF/X-4 for print.** Under *CMYK colour* in a PDF export: an output intent for coated
+  FOGRA39 with its ICC profile, colours converted through it, transparency in CMYK.
+
 ## Plus 13 · FigCraft v0.14.0 — 2026-11-02
 
 - Fixed: the colour picker opened from a colour style's swatch covered the style dialog; it opens

@@ -73,6 +73,7 @@ pub(crate) fn doc_root(doc: &Document) -> f64 {
 /// Each frame: the open file's root size and units (and a unit picked from a field's chip).
 pub(crate) fn tick(app: &mut FigApp, ctx: &egui::Context) {
     crate::responsive_ui::tick();
+    crate::dpi_ui::tick(app);
     crate::units_ui::apply_pending(app, ctx);
     let doc = app.session.doc().ok();
     let r = doc.map(doc_root).unwrap_or(DEFAULT_ROOT);
@@ -88,19 +89,22 @@ pub(crate) fn begin_parse() {
 }
 
 /// A number `v` typed with `unit`, in px: rem is the root size; mm, cm, in and pt are print
-/// lengths (a px is a point, as in FigCraft's print export).
+/// lengths (a px is a point, as in FigCraft's print export, unless the frame has its own resolution).
 pub(crate) fn unit(v: f64, unit: &str) -> f64 {
     // FigCraft Plus: %, vw and vh in W / H (responsive_ui).
     if let Some(px) = crate::responsive_ui::unit(v, unit) {
         EXPLICIT.with(|e| e.set(true));
         return px;
     }
+    // Print lengths at the resolution of the selection's frame (`dpi_ui`): 72 unless it says.
+    let dpi = crate::dpi_ui::dpi();
     let k = match unit.to_ascii_lowercase().as_str() {
         "rem" => root(),
-        "px" | "pt" => 1.0,
-        "mm" => 72.0 / 25.4,
-        "cm" => 72.0 / 2.54,
-        "in" => 72.0,
+        "px" => 1.0,
+        "pt" => dpi / 72.0,
+        "mm" => dpi / 25.4,
+        "cm" => dpi / 2.54,
+        "in" => dpi,
         _ => return v,
     };
     EXPLICIT.with(|e| e.set(true));
