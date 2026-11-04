@@ -1,8 +1,11 @@
-blank_issues_enabled: true
+blank_issues_enabled: false
 contact_links:
-  - name: Roadmap
-    url: https://github.com/promocot/FigCraft-Plus/blob/main/ROADMAP.md
-    about: What's being worked on and what comes next.
   - name: A bug in FigCraft itself
     url: https://github.com/storytold/figcraft/issues
-    about: Problems that also happen in the official FigCraft.
+    about: Anything that also happens in the official FigCraft of the same version — their fix reaches FigCraft Plus with their next release.
+  - name: Guide and test scenarios
+    url: https://github.com/promocot/figcraft-Plus/blob/main/docs/GUIDE.md
+    about: How each FigCraft Plus feature works, step by step, and what you should see.
+  - name: Roadmap
+    url: https://github.com/promocot/figcraft-Plus/blob/main/ROADMAP.md
+    about: What's being worked on and what comes next.

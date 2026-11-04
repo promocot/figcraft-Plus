@@ -114,6 +114,7 @@ fn export_css(app: &mut FigApp, c: Choice) {
 /// The Import button's menu: FigCraft's variables JSON (`json`: its own dialog), or CSS.
 pub(crate) fn import_menu(app: &mut FigApp, import: &Response, json: fn(&mut FigApp)) {
     let mut pick: Option<bool> = None;
+    let mut dtcg = false;
     crate::right::menu_popup(import).show(|ui| {
         if crate::right::menu_item(ui, tr("Variables JSON…"), "") {
             pick = Some(false);
@@ -123,12 +124,49 @@ pub(crate) fn import_menu(app: &mut FigApp, import: &Response, json: fn(&mut Fig
             pick = Some(true);
             ui.close();
         }
+        if crate::right::menu_item(ui, tr("Design tokens (DTCG)…"), "") {
+            dtcg = true;
+            ui.close();
+        }
     });
     match pick {
         Some(false) => json(app),
         Some(true) => import_css(app),
+        None if dtcg => import_dtcg(app),
         None => {}
     }
+}
+
+/// Export ▸ Design tokens (DTCG)…: this file's variables as DTCG JSON.
+pub(crate) fn export_dtcg(app: &mut FigApp) {
+    let name = app.session.doc().map(|d| format!("{}.tokens.json", d.name)).unwrap_or_else(|_| "tokens.json".into());
+    if app.services.downloads() {
+        let Some(r) = app.run("variable.exportDtcg", json!({})) else { return };
+        let text = r["text"].as_str().unwrap_or_default();
+        if app.services.download(&name, text.as_bytes()) {
+            app.toast(trf("Exported {file}", &[("file", &name)]));
+        }
+        return;
+    }
+    app.pick_save(tr("Export variables"), &name, &["json"], move |app, p| {
+        if app.run("variable.exportDtcg", json!({"path": p.to_string_lossy()})).is_some() {
+            let file = p.file_name().map(|f| f.to_string_lossy().to_string()).unwrap_or_default();
+            app.toast(trf("Exported {file}", &[("file", &file)]));
+        }
+    });
+}
+
+fn import_dtcg(app: &mut FigApp) {
+    app.pick_open(tr("Import variables"), &["json"], |app, p| {
+        let Some(r) = app.run("variable.importDtcg", json!({"json": p.to_string_lossy()})) else { return };
+        let (added, updated) = (r["variables"].as_u64().unwrap_or(0), r["updated"].as_u64().unwrap_or(0));
+        let skipped = r["warnings"].as_array().map_or(0, Vec::len);
+        let mut msg = trn("Imported {n} new variables, updated {updated}", added as usize, &[("updated", &updated)]);
+        if skipped > 0 {
+            msg = format!("{msg} {}", trn("({n} warnings: some entries were skipped)", skipped, &[]));
+        }
+        app.toast(msg);
+    });
 }
 
 fn import_css(app: &mut FigApp) {

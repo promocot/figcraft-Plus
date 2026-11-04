@@ -46,11 +46,13 @@ pub(crate) struct Prefs {
     pub key_object: bool,
     /// The resolution (DPI) new top-level frames are made at.
     pub dpi: f64,
+    /// Export presets (Export ▸ Export with a preset…).
+    pub export_presets: Vec<crate::presets_ui::Preset>,
 }
 
 impl Default for Prefs {
     fn default() -> Self {
-        Prefs { rem: false, text: String::new(), layout_unit: "px".into(), root: 16.0, color_model: "Hex".into(), precision: 2, picker_follows_selection: true, font_replacements: Default::default(), key_object: true, dpi: 72.0 }
+        Prefs { rem: false, text: String::new(), layout_unit: "px".into(), root: 16.0, color_model: "Hex".into(), precision: 2, picker_follows_selection: true, font_replacements: Default::default(), key_object: true, dpi: 72.0, export_presets: crate::presets_ui::defaults() }
     }
 }
 
@@ -99,7 +101,7 @@ pub(crate) fn precision() -> usize {
     usize::from(p.min(4))
 }
 
-fn set(f: impl FnOnce(&mut Prefs)) {
+pub(crate) fn set(f: impl FnOnce(&mut Prefs)) {
     let mut p = store();
     f(&mut p);
     PRECISION.store(p.precision.min(4), Ordering::Relaxed);
@@ -219,6 +221,7 @@ pub(crate) fn preferences(ui: &mut Ui) {
             set(|p| p.dpi = v.clamp(figcraft_engine::dpi::MIN, figcraft_engine::dpi::MAX));
         }
     });
+    crate::presets_ui::prefs(ui);
     if !p.font_replacements.is_empty() {
         ui.add_space(6.0);
         ui.label(egui::RichText::new(tr("Remembered font replacements")).font(regular(11.0)).color(t.text));
