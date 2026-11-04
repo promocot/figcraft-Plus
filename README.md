@@ -439,7 +439,7 @@ the files and keeps the last computed values.
 >
 > **FigCraft Plus:** **Preferences ▸ FigCraft Plus**: the layout and text units and the root size for new files, and the model the colour picker opens in.
 
-<img src="docs/images/37-preferences.png" width="440" alt="Preferences ▸ FigCraft Plus: layout unit, text unit, default root size, decimals shown, the model the colour picker opens in, Picker follows the selection, Key object for aligning">
+<img src="docs/images/37-preferences.png" width="440" alt="Preferences ▸ FigCraft Plus: layout unit, text unit, default root size, decimals shown, the model the colour picker opens in, Picker follows the selection, Key object for aligning, Resolution of new frames 72 dpi">
 
 | Setting | What it does |
 |---|---|
@@ -846,11 +846,11 @@ in exports. That fixes imports that arrive in the wrong order (`n-xs, n-6xl, n-s
 >
 > **FigCraft Plus:** The line height can follow a number variable as a **percentage of the font size**, as CSS writes it: `leading/normal = 140%` suits every size.
 
-<img src="docs/images/49-line-height-percent.png" width="560" alt="The line height's variable list with the px | % switch on %: leading/tight 120%, normal 140%, relaxed 160%; the field reads normal · 140%">
+<img src="docs/images/49-line-height-percent.png" width="560" alt="The line height's variable list with the px | % switch on %: leading/tight 120%, normal 140%, relaxed 160%; the field reads 140% normal">
 
 - Hover the line height field, click the variable button, and pick **%** in the *Line height in px | %*
   switch under the search — the list then shows each variable as a percentage. The field shows its
-  chip, `normal · 140%`; a click on it picks another, its detach button keeps the value.
+  chip, `140% normal`; a click on it picks another, its detach button keeps the value.
 - A value up to 5 is a ratio, as a unitless CSS `line-height`: `1.4` is 140%. Above, a percentage.
 - Text layers and **text styles** (the style dialog's line height) take it; the layers using a
   style follow it. Modes switch it (tight leading on Mobile, relaxed on Desktop).
@@ -906,7 +906,7 @@ in exports. That fixes imports that arrive in the wrong order (`n-xs, n-6xl, n-s
 >
 > **FigCraft Plus:** **PDF/X-4** for coated FOGRA39 paper: the file a print shop's preflight expects.
 
-<img src="docs/images/52-pdfx.png" width="300" alt="A PDF export setting's print options: bleed 3 mm, crop marks, CMYK colour, and PDF/X-4 (coated FOGRA39) ticked">
+<img src="docs/images/52-pdfx.png" width="222" alt="A PDF export setting's print options: 8.5 pt bleed, crop marks, CMYK colour, and PDF/X-4 (coated FOGRA39) ticked">
 
 - In a PDF export's print options, under **CMYK colour**: **PDF/X-4 (coated FOGRA39)**. Every
   CMYK PDF of the file is then PDF/X-4:

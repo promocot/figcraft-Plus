@@ -3,7 +3,7 @@
 //! - The variable picker of a line height (a text layer's, a text style's) has a **px | %** switch
 //!   under its search field: px binds the variable FigCraft's way, % makes the line height follow it
 //!   as a percentage of the font size (140 → 140%, 1.4 → 140%). The rows then show their values as
-//!   percentages (this file's variables only). The switch opens on how the field is bound now, else on the last choice (% first).
+//!   percentages (this file's variables only). The switch opens on how the field is bound now, else on the last choice (px, as FigCraft binds, until % is picked).
 //! - A line height that follows a variable shows its chip, as a bound field does, with a `%`: a
 //!   click on it opens the picker, its detach button keeps the value and ends the link.
 
@@ -63,7 +63,7 @@ fn opens_in_percent(ctx: &egui::Context, doc: &Document, target: &Target) -> boo
     if px {
         return false;
     }
-    ctx.data(|d| d.get_temp::<bool>(remembered_id())).unwrap_or(true)
+    ctx.data(|d| d.get_temp::<bool>(remembered_id())).unwrap_or(false)
 }
 
 /// The picker for `target` is about to draw: switch the line-height mode on (or off for any other
@@ -165,8 +165,9 @@ pub(crate) fn apply(app: &mut FigApp, target: &Target, pick: &Pick) {
 fn chip_label(name: &str, at: Option<figcraft_doc::LineHeight>) -> String {
     let short = name.rsplit('/').next().unwrap_or(name);
     match at {
-        Some(figcraft_doc::LineHeight::Percent(p)) => format!("{short} · {}%", figcraft_doc::text::trim_num(p)),
-        _ => format!("{short} · %"),
+        // The percentage first: the chip is narrow.
+        Some(figcraft_doc::LineHeight::Percent(p)) => format!("{}% {short}", figcraft_doc::text::trim_num(p)),
+        _ => format!("% {short}"),
     }
 }
 
