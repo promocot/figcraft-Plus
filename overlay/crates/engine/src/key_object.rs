@@ -12,7 +12,9 @@ use figcraft_doc::NodeId;
 
 thread_local! {
     static KEY: Cell<Option<NodeId>> = const { Cell::new(None) };
-    static ENABLED: Cell<bool> = const { Cell::new(true) };
+    // Off in this crate's tests, which check FigCraft's own click rules; the key object's tests turn
+    // it on.
+    static ENABLED: Cell<bool> = const { Cell::new(!cfg!(test)) };
 }
 
 /// Whether a click in a selection picks the key object.

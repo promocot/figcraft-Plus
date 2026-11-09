@@ -75,7 +75,7 @@
     "note": "variables: drag rows, select several",
     "file": "crates/ui-egui/src/dialogs/variables_panel.rs",
     "find": "    let (r, resp) = ui.allocate_exact_size(vec2(width, ROW_H), Sense::click());\n",
-    "replace": "    let (r, resp) = ui.allocate_exact_size(vec2(width, ROW_H), if view.editable() { Sense::click_and_drag() } else { Sense::click() });\n    crate::var_order_ui::var_row(ui, view.editable(), &coll.id, &v.id, &v.name, r, &resp);\n"
+    "replace": "    let (r, resp) = ui.allocate_exact_size(vec2(width, ROW_H), if view.editable() { Sense::click_and_drag() } else { Sense::click() });\n    crate::var_order_ui::var_row(ui, view.editable(), &coll.id, &v.id, &v.name, r, &resp, &st.selected);\n"
   },
   {
     "note": "Spanish (a complete catalog): the variable order commands",

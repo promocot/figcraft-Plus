@@ -62,8 +62,8 @@
   {
     "note": "picker: FigCraft's popover as wide as the model needs; the header shows Custom | Libraries",
     "file": "crates/ui-egui/src/widgets/colorpicker.rs",
-    "find": "    pop = pop.close_on_outside(!picking);\n",
-    "replace": "    pop = pop.close_on_outside(!picking);\n    // FigCraft Plus: as wide as the colour model needs; Custom | Libraries take the header's title.\n    pop = pop.width(w);\n    pop.title = crate::picker_libraries_ui::title(&target);\n    let header = pop.header;\n"
+    "find": "    pop = pop.close_on_outside(!own);\n",
+    "replace": "    pop = pop.close_on_outside(!own);\n    // FigCraft Plus: as wide as the colour model needs; Custom | Libraries take the header's title.\n    pop = pop.width(w);\n    pop.title = crate::picker_libraries_ui::title(&target);\n    let header = pop.header;\n"
   },
   {
     "note": "picker: the blend row knows the picker's width",

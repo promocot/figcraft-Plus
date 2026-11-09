@@ -210,7 +210,19 @@ inside). Lessons learned:
 
 ## 8. Where things stand (update this section when you finish work)
 
-- **Released:** Plus 15 on FigCraft v0.15.0 (2026-11-04): every add-on carried to 0.15.0 (the hooks
+- **Released:** Plus 16 on FigCraft v0.17.0 (2026-11-09).
+  - FigCraft 0.17 selects several variables itself (`Editor::selected`, #2002): `var_order_ui::var_row`
+    takes that selection (for drags and Alt+↑/↓) and paints nothing of its own.
+  - In this crate's tests FigCraft's own rules hold: `key_object` is off under `cfg(test)` and
+    `picker_place_ui::follows()` is off unless a test sets it, so FigCraft's selection and picker
+    tests pass; Plus's own tests turn them on.
+  - `dtcg.rs` keeps key order with its own `Node` tree (serde_json's map sorts keys in this build;
+    don't turn on `preserve_order`, it would change FigCraft's file output).
+  - Text styles gained paragraph settings (`StyleKind::Text { style, paragraph }`): match them with
+    `{ style, .. }`.
+  - Engine test `board_tables_tests::a_double_click_types_in_the_cell…` fails here on clean
+    FigCraft too (no `craft-fonts` checkout); not Plus's.
+- **Plus 15** on FigCraft v0.15.0 (2026-11-04): every add-on carried to 0.15.0 (the hooks
   apply unchanged) and the roadmap's "Next".
   - Engine `dtcg.rs`: `variable.exportDtcg` / `variable.importDtcg` (W3C Design Tokens: collections
     as groups, `$type` / `$value`, `{a.b}` aliases, modes in `$extensions["figcraft.modes"]`, the

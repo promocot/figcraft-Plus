@@ -98,7 +98,7 @@ fn texts<'a>(doc: &'a Document, ids: &[String]) -> Vec<(&'a str, &'a str, &'a Te
         .filter_map(|id| {
             let s = doc.style(id)?;
             match &s.kind {
-                StyleKind::Text { style } => Some((s.id.as_str(), s.name.as_str(), style)),
+                StyleKind::Text { style, .. } => Some((s.id.as_str(), s.name.as_str(), style)),
                 _ => None,
             }
         })

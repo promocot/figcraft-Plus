@@ -103,7 +103,7 @@ mod tests {
         }
         let doc = s.doc().unwrap();
         let kinds: Vec<&StyleKind> = doc.styles.iter().map(|st| &st.kind).collect();
-        assert!(matches!(kinds[0], StyleKind::Text { style } if style.font_family == "Inter" && style.font_size == 12.0));
+        assert!(matches!(kinds[0], StyleKind::Text { style, .. } if style.font_family == "Inter" && style.font_size == 12.0));
         assert!(matches!(kinds[1], StyleKind::Paint { paints } if paints.len() == 1));
         assert!(matches!(kinds[2], StyleKind::Effect { effects } if effects.len() == 1));
         assert!(matches!(kinds[3], StyleKind::Grid { grids } if grids.len() == 1));

@@ -297,7 +297,7 @@ pub(crate) fn show(app: &mut FigApp, ctx: &egui::Context) {
             }
         }
         match &st.kind {
-            StyleKind::Text { style } => text_props(app, ui, &doc, &st, style, &mut d.more),
+            StyleKind::Text { style, .. } => text_props(app, ui, &doc, &st, style, &mut d.more),
             StyleKind::Paint { paints } => paint_rows(app, ui, &doc, &st, paints),
             StyleKind::Effect { effects } => {
                 let labels: Vec<String> = effects.iter().map(|e| tr(e.label()).to_string()).collect();
@@ -403,7 +403,7 @@ fn preview(ui: &mut Ui, st: &Style, t: &Tokens) {
     widgets::checker(&ui.painter().with_clip_rect(inner), inner, 8.0);
     let p = ui.painter();
     match &st.kind {
-        StyleKind::Text { style } => {
+        StyleKind::Text { style, .. } => {
             let mut budget = 2;
             match crate::font_preview::texture(ui.ctx(), style, "Rag 123", &mut budget) {
                 Some(tex) => {
@@ -1221,7 +1221,7 @@ mod tests {
         let st = s.execute("style.create", &json!({"type": "text", "name": "H", "value": json_of(&ts)})).unwrap()["id"].as_str().unwrap().to_string();
         s.execute("style.bind", &json!({"style": st, "field": "fontWeight", "variable": w})).unwrap();
         let style = |s: &Session| match &s.doc().unwrap().style(&st).unwrap().kind {
-            StyleKind::Text { style } => style.font_style.clone(),
+            StyleKind::Text { style, .. } => style.font_style.clone(),
             _ => String::new(),
         };
         assert_eq!(style(&s), "Bold Italic");

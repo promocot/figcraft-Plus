@@ -111,7 +111,7 @@ fn layer_heights(doc: &Document, id: NodeId) -> Option<Vec<LineHeight>> {
 
 fn style_height(doc: &Document, style: &str) -> Option<LineHeight> {
     match &doc.style(style)?.kind {
-        StyleKind::Text { style } => Some(style.line_height),
+        StyleKind::Text { style, .. } => Some(style.line_height),
         _ => None,
     }
 }
@@ -189,7 +189,7 @@ pub fn resolve(doc: &mut Document, before: &Document, touched: &BTreeSet<NodeId>
         let Some(p) = style_percent(doc, &name) else { continue };
         let want = LineHeight::Percent(p);
         if let Some(st) = doc.styles.iter_mut().find(|s| s.id == sid)
-            && let StyleKind::Text { style } = &mut st.kind
+            && let StyleKind::Text { style, .. } = &mut st.kind
             && !same(style.line_height, want)
         {
             style.line_height = want;

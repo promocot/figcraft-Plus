@@ -51,7 +51,7 @@ pub(crate) fn commands(doc: &Document, family: &str, with: &str) -> Vec<Value> {
         }
     }
     for s in figcraft_engine::library::local_styles(doc) {
-        if let StyleKind::Text { style } = &s.kind
+        if let StyleKind::Text { style, .. } = &s.kind
             && same(&style.font_family)
             && let Ok(mut v) = serde_json::to_value(style)
         {

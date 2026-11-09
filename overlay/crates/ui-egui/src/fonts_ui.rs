@@ -157,7 +157,7 @@ pub(crate) fn tick(app: &mut FigApp, ctx: &egui::Context) {
         }
     }
     for s in &d.doc.styles {
-        if let figcraft_doc::StyleKind::Text { style } = &s.kind {
+        if let figcraft_doc::StyleKind::Text { style, .. } = &s.kind {
             note(&style.font_family);
         }
     }

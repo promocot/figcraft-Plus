@@ -1,7 +1,6 @@
 //! FigCraft Plus: ordering in the Variables editor.
 //!
-//! - Variables: click to select, Shift+click for a range, Ctrl/Cmd+click to add; drag the
-//!   selection (by its name) to another place in the table — or onto another group's header, or a
+//! - Variables: drag the selection (FigCraft's: click, Shift+click, Ctrl/Cmd+click) (by its name) to another place in the table — or onto another group's header, or a
 //!   group in the sidebar, to move it into that group (renamed). Alt+↑/↓ moves the selection a row.
 //! - Groups: drag a group's header in the table, or a group in the sidebar, before or after another
 //!   one; drop it on "All variables" to move it to the top level.
@@ -160,42 +159,17 @@ fn over(ui: &Ui, r: Rect) -> Option<bool> {
 }
 
 /// A variable's row in the table (after FigCraft allocates it): selection, dragging, dropping.
-pub(crate) fn var_row(ui: &mut Ui, editable: bool, coll: &str, id: &str, name: &str, r: Rect, resp: &Response) {
+/// A variable row: drag it (with the rows selected with it) to another place. `selected` is
+/// FigCraft's own selection of variables (click, Shift+click, Ctrl/Cmd+click), which the drag and
+/// Alt+↑/↓ move.
+#[allow(clippy::too_many_arguments)]
+pub(crate) fn var_row(ui: &mut Ui, editable: bool, coll: &str, id: &str, name: &str, r: Rect, resp: &Response, selected: &[String]) {
     let ctx = ui.ctx().clone();
-    let t = Tokens::get(&ctx);
-    let sel = selection(&ctx);
-    if sel.iter().any(|s| s == id) {
-        ui.painter().rect_filled(r, CornerRadius::ZERO, t.selected_row);
-    }
     if !editable {
         return;
     }
-    if resp.clicked() {
-        let m = ctx.input(|i| i.modifiers);
-        let vis: Visible = get(&ctx, visible_id());
-        let new = if m.shift {
-            let anchor: String = get(&ctx, anchor_id());
-            let pos = |x: &str| vis.rows.iter().position(|(i, _)| i == x);
-            match (pos(&anchor), pos(id)) {
-                (Some(a), Some(b)) => vis.rows[a.min(b)..=a.max(b)].iter().map(|(i, _)| i.clone()).collect(),
-                _ => vec![id.to_string()],
-            }
-        } else if m.command || m.ctrl {
-            let mut s = sel.clone();
-            if let Some(k) = s.iter().position(|x| x == id) {
-                s.remove(k);
-            } else {
-                s.push(id.to_string());
-            }
-            s
-        } else {
-            vec![id.to_string()]
-        };
-        if !m.shift {
-            ctx.data_mut(|d| d.insert_temp(anchor_id(), id.to_string()));
-        }
-        ctx.data_mut(|d| d.insert_temp(sel_id(), new));
-    }
+    ctx.data_mut(|d| d.insert_temp(sel_id(), selected.to_vec()));
+    let sel = selected.to_vec();
     if resp.drag_started() {
         let ids = if sel.iter().any(|s| s == id) {
             // The selection, in the table's order.

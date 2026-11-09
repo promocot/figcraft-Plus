@@ -48,7 +48,7 @@ thread_local! {
     static FOLLOWS_FOR_TEST: std::cell::Cell<Option<bool>> = const { std::cell::Cell::new(None) };
 }
 
-/// For tests: the preference on this thread (None: the stored one).
+/// For tests: the preference on this thread (None: off, FigCraft's own behaviour).
 #[cfg(test)]
 pub(crate) fn set_follows_for_test(on: Option<bool>) {
     FOLLOWS_FOR_TEST.with(|f| f.set(on));
@@ -57,8 +57,9 @@ pub(crate) fn set_follows_for_test(on: Option<bool>) {
 /// Whether the picker follows the selection (the preference).
 pub(crate) fn follows() -> bool {
     #[cfg(test)]
-    if let Some(on) = FOLLOWS_FOR_TEST.with(std::cell::Cell::get) {
-        return on;
+    {
+        // Tests check FigCraft's own picker unless they turn following on.
+        return FOLLOWS_FOR_TEST.with(std::cell::Cell::get).unwrap_or(false);
     }
     crate::prefs_plus_ui::get().picker_follows_selection
 }

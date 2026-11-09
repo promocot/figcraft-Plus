@@ -191,7 +191,7 @@ pub(crate) fn layer_chip(app: &mut FigApp, ui: &mut Ui, ids: &[NodeId], rect: Re
 pub(crate) fn style_chip(app: &mut FigApp, ui: &mut Ui, doc: &Document, style: &str, rect: Rect) -> bool {
     let Some(name) = figcraft_engine::leading::style_rule(doc, style) else { return false };
     let at = match doc.style(style).map(|s| &s.kind) {
-        Some(figcraft_doc::StyleKind::Text { style }) => Some(style.line_height),
+        Some(figcraft_doc::StyleKind::Text { style, .. }) => Some(style.line_height),
         _ => None,
     };
     match widgets::bound_field(ui, Id::unique(("figcraftplus_leading_style_chip", style)), Lead::None, rect, &chip_label(&name, at)) {

@@ -11,7 +11,7 @@
 </p>
 
 <p align="center">
-  <b>FigCraft Plus 15</b> · built on FigCraft <b>v0.15.0</b>, the latest official release ·
+  <b>FigCraft Plus 16</b> · built on FigCraft <b>v0.17.0</b>, the latest official release ·
   <code>.figcraft</code> files stay compatible with the official app, both ways
 </p>
 
@@ -176,7 +176,7 @@ what you edit are offered.
 version; Plus goes further. Features FigCraft has since added itself are
 [listed separately](#now-in-figcraft-itself-removed-from-plus) — they are no longer part of Plus.
 
-| Feature | In FigCraft v0.15.0 | In FigCraft Plus | |
+| Feature | In FigCraft v0.17.0 | In FigCraft Plus | |
 |---|---|---|---|
 | [OKLCH, done the oklch.com way](#oklch-done-the-oklchcom-way) | FigCraft has OKLCH fields: lightness in percent, sRGB only, and the HSB square and rainbow stay HSB. | The whole picker works in OKLCH (an OKLCH plane with the exact gamut edge, an OKLCH hue strip), values match oklch.com and CSS, and Display P3 files are read in P3. | 🔵 Enhanced |
 | [Derived colours and calculated variables](#derived-colours-and-calculated-variables) | A variable can be an *alias* of another — an exact copy, nothing more. | A colour can be *made from* another (transparency, lighter / darker, its complement, a mix of two), and a number from other numbers, all kept in step in every mode. | 🟣 Exclusive |
@@ -206,7 +206,7 @@ version; Plus goes further. Features FigCraft has since added itself are
 | [PDF/X-4 for print](#pdfx-4-for-print) | A CMYK PDF with bleed, marks and page boxes, converted by formula, without an output intent. | **PDF/X-4** for coated FOGRA39 paper: the output intent with its ICC profile, colours converted through it, transparency in CMYK — what print shops' preflight asks for. | 🔵 Enhanced |
 | [Export presets](#export-presets) | Each layer keeps its own export settings; files are named after the layer with a suffix. | **Presets…**: several sizes and formats for every selected layer at once, files named by a pattern (`{name}_{w}x{h}`, folders with `/`); presets saved and edited in Preferences. | 🔵 Enhanced |
 | [Design tokens (DTCG)](#design-tokens-dtcg) | Variables export as JSON, CSS, Tailwind, Dart and import from FigCraft's JSON. | **DTCG JSON** both ways — the W3C Design Tokens format other tools read: `$type`, `$value`, aliases, every mode. | 🟣 Exclusive |
-| [Reorder variables: drag & drop and sorting](#reorder-variables-drag--drop-and-sorting) | Modes can be reordered; variables keep the order they were made in. | Drag variables, groups and collections, multi-select, Alt+↑/↓, and natural or by-value sorting — also as commands for scripts and MCP. | 🟣 Exclusive |
+| [Reorder variables: drag & drop and sorting](#reorder-variables-drag--drop-and-sorting) | Modes can be reordered; several variables can be selected (Shift / Ctrl) to delete, group or scope them; variables keep the order they were made in. | Drag variables (the selected ones together), groups and collections, Alt+↑/↓, and natural or by-value sorting — also as commands for scripts and MCP. | 🟣 Exclusive |
 
 Everything stays a normal `.figcraft` file: the official app opens it and sees the last computed
 colours and sizes; formulas and settings are kept as text it ignores.
@@ -694,9 +694,9 @@ turned off is offered nowhere but the Variables editor, so lists stay short.
 
 **🟣 Exclusive** — only in FigCraft Plus (for now)
 
-> **FigCraft:** Modes can be reordered; variables keep the order they were made in.
+> **FigCraft:** Modes can be reordered; several variables can be selected (Shift / Ctrl) to delete, group or scope them; variables keep the order they were made in.
 >
-> **FigCraft Plus:** Drag variables, groups and collections, multi-select, Alt+↑/↓, and natural or by-value sorting — also as commands for scripts and MCP.
+> **FigCraft Plus:** Drag variables (the selected ones together), groups and collections, Alt+↑/↓, and natural or by-value sorting — also as commands for scripts and MCP.
 
 Variables, groups and collections keep the order you give them: in the editor, in the file and
 in exports. That fixes imports that arrive in the wrong order (`n-xs, n-6xl, n-s, n-m …` or
@@ -707,8 +707,9 @@ in exports. That fixes imports that arrive in the wrong order (`n-xs, n-6xl, n-s
 - **Drag a variable** up or down in the table; a blue line shows where it lands. Drop it on
   another group's rows or header to move it into that group (it is renamed `group/name`, e.g.
   `space/gap` → `number/gap`). Variables stay in their collection.
-- **Select several**: click, then **Shift**-click for a range or **Ctrl**-click to add or remove
-  one; drag any selected row to move them all. **Esc** clears the selection (or cancels a drag).
+- **Several at once**: select them the FigCraft way (click, **Shift**-click for a range,
+  **Ctrl**-click to add or remove one) and drag any selected row to move them all. **Esc** cancels
+  a drag.
 - **Alt + ↑ / ↓** moves the selected variables one row within their group.
 - **Drag a group** by its header in the table or its row in the sidebar (to the top level: drop on
   **All variables**). Subgroups move with it.

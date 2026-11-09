@@ -7,6 +7,24 @@ Every FigCraft Plus release, newest first. Each one is built on an official FigC
 **🟣 Exclusive** — FigCraft has nothing like it yet. **🔵 Enhanced** — FigCraft has a basic
 version; Plus goes further.
 
+## Plus 16 · FigCraft v0.17.0 — 2026-11-09
+
+Every add-on carried over to FigCraft 0.17.0.
+
+- **Variables: FigCraft's own multi-select.** FigCraft now selects several variables (click,
+  Shift, Ctrl/Cmd) and deletes, groups or scopes them at once. Plus no longer keeps a selection of
+  its own: dragging and Alt+↑/↓ move FigCraft's selection, so selected rows are painted once and
+  its right-click menu acts on the same rows.
+- **Design tokens (DTCG) keep their order.** Collections and tokens are imported in the file's
+  order and exported in the variables' order (they came out alphabetical).
+- The variable picker shares its search with FigCraft's and, like FigCraft's, grows back after a
+  search.
+- Under the hood: three hooks follow FigCraft's changed code (the colour picker's closing rule,
+  the export's encoder, the Export section's rows); text styles' new paragraph settings are left as
+  they are; the DPI step of the edit pipeline sits after the others, so re-applying Plus to the
+  same folder doesn't repeat a step. FigCraft's own tests run with Plus's key object and
+  picker-follows-selection off (Plus's tests turn them on), so they check FigCraft's rules.
+
 ## Plus 15 · FigCraft v0.15.0 — 2026-11-04
 
 Every add-on carried over to FigCraft 0.15.0 (nothing it added duplicates Plus: its auto layout

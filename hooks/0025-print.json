@@ -14,14 +14,14 @@
   {
     "note": "engine: new top-level frames take the default resolution",
     "file": "crates/engine/src/derived.rs",
-    "find": "    // FigCraft Plus: % / vw / vh sizes and auto layout from variables.\n",
-    "replace": "    // FigCraft Plus: new top-level frames take the default resolution (DPI).\n    crate::dpi::resolve(doc, before, &touched);\n    // FigCraft Plus: % / vw / vh sizes and auto layout from variables.\n"
+    "find": "    crate::gradient_oklch::resolve(doc, before, &touched);\n    touched.extend(doc.take_dirty());\n",
+    "replace": "    crate::gradient_oklch::resolve(doc, before, &touched);\n    touched.extend(doc.take_dirty());\n    // FigCraft Plus: new top-level frames take the default resolution (DPI).\n    crate::dpi::resolve(doc, before, &touched);\n    touched.extend(doc.take_dirty());\n"
   },
   {
     "note": "export: a PNG or JPG of a frame says its resolution",
     "file": "crates/engine/src/cmd/file.rs",
-    "find": "            Ok((figcraft_render::encode_export(&pix, setting.format, doc.color_profile).map_err(EngineError::Other)?, Vec::new()))\n",
-    "replace": "            let bytes = figcraft_render::encode_export(&pix, setting.format, doc.color_profile).map_err(EngineError::Other)?;\n            // FigCraft Plus: a frame's resolution (DPI) goes with it.\n            Ok((crate::dpi::with_export_dpi(doc, ids, setting.format, scale, bytes), Vec::new()))\n"
+    "find": "            Ok((bytes.map_err(EngineError::Other)?, Vec::new()))\n",
+    "replace": "            let bytes = bytes.map_err(EngineError::Other)?;\n            // FigCraft Plus: a frame's resolution (DPI) goes with it.\n            Ok((crate::dpi::with_export_dpi(doc, ids, setting.format, scale, bytes), Vec::new()))\n"
   },
   {
     "note": "export: a CMYK PDF of a PDF/X file is PDF/X-4",

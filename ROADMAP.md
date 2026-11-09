@@ -57,6 +57,7 @@ Full details in the [changelog](CHANGELOG.md).
 
 | Release | Highlights |
 |---|---|
+| **Plus 16** | On FigCraft 0.17.0 · variables use FigCraft's new multi-select · DTCG keeps the file's order |
 | **Plus 15** | On FigCraft 0.15.0 · **export presets** (sizes, formats, a name pattern) · **design tokens (DTCG)** both ways · the [guide](docs/GUIDE.md) |
 | **Plus 14** | **Line height in % from a variable** · **gradients blended in OKLCH** (gradient tokens) · **resolution (DPI) per frame** · **PDF/X-4** for coated FOGRA39 |
 | **Plus 13** | Fixes: the picker beside a colour style's dialog again; contrast samples one under the other in a narrow picker |

@@ -18,7 +18,8 @@ use std::collections::{BTreeMap, BTreeSet};
 
 use figcraft_color::Color;
 use figcraft_doc::{Collection, Document, Mode, ModeId, Variable, VariableId, VariableType, VariableValue};
-use serde_json::{Map, Value, json};
+use serde::de::{Deserialize, Deserializer, MapAccess, SeqAccess, Visitor};
+use serde_json::{Value, json};
 
 use super::CommandSpec;
 use crate::library::{is_remote_collection, local_collections};
@@ -28,6 +29,158 @@ use crate::{EngineError, Result, Session, bad, spec};
 
 const MODES: &str = "figcraft.modes";
 const FORMULA: &str = "figcraft.formula";
+
+/// JSON whose objects keep their keys in order. serde_json's map sorts keys in this build, and a
+/// token file's order is the variables' order: it goes out and comes back as it is.
+#[derive(Clone, Debug, PartialEq)]
+enum Node {
+    Leaf(Value),
+    Obj(Vec<(String, Node)>),
+}
+
+impl Node {
+    fn obj() -> Node {
+        Node::Obj(Vec::new())
+    }
+
+    fn entries(&self) -> &[(String, Node)] {
+        match self {
+            Node::Obj(e) => e,
+            Node::Leaf(_) => &[],
+        }
+    }
+
+    fn get(&self, k: &str) -> Option<&Node> {
+        self.entries().iter().find(|(x, _)| x == k).map(|(_, v)| v)
+    }
+
+    fn contains_key(&self, k: &str) -> bool {
+        self.get(k).is_some()
+    }
+
+    fn is_obj(&self) -> bool {
+        matches!(self, Node::Obj(_))
+    }
+
+    fn as_str(&self) -> Option<&str> {
+        match self {
+            Node::Leaf(Value::String(s)) => Some(s),
+            _ => None,
+        }
+    }
+
+    /// Set `k` (in its place, or last).
+    fn set(&mut self, k: &str, v: Node) {
+        if let Node::Leaf(_) = self {
+            *self = Node::obj();
+        }
+        if let Node::Obj(e) = self {
+            match e.iter_mut().find(|(x, _)| x == k) {
+                Some((_, old)) => *old = v,
+                None => e.push((k.to_string(), v)),
+            }
+        }
+    }
+
+    /// The child `k`, made an empty object when missing.
+    fn child(&mut self, k: &str) -> &mut Node {
+        if !self.contains_key(k) {
+            self.set(k, Node::obj());
+        }
+        let Node::Obj(e) = self else { unreachable!("set makes an object") };
+        &mut e.iter_mut().find(|(x, _)| x == k).expect("just set").1
+    }
+
+    fn value(&self) -> Value {
+        match self {
+            Node::Leaf(v) => v.clone(),
+            Node::Obj(e) => Value::Object(e.iter().map(|(k, v)| (k.clone(), v.value())).collect()),
+        }
+    }
+
+    fn from_value(v: &Value) -> Node {
+        match v {
+            Value::Object(m) => Node::Obj(m.iter().map(|(k, x)| (k.clone(), Node::from_value(x))).collect()),
+            other => Node::Leaf(other.clone()),
+        }
+    }
+
+    /// Pretty JSON, two spaces in, as serde_json writes it.
+    fn pretty(&self) -> String {
+        fn go(n: &Node, out: &mut String, depth: usize) {
+            match n {
+                Node::Leaf(v) => out.push_str(&serde_json::to_string(v).unwrap_or_else(|_| "null".into())),
+                Node::Obj(e) if e.is_empty() => out.push_str("{}"),
+                Node::Obj(e) => {
+                    out.push_str("{\n");
+                    for (i, (k, v)) in e.iter().enumerate() {
+                        out.push_str(&"  ".repeat(depth + 1));
+                        out.push_str(&serde_json::to_string(k).unwrap_or_default());
+                        out.push_str(": ");
+                        go(v, out, depth + 1);
+                        out.push_str(if i + 1 < e.len() { ",\n" } else { "\n" });
+                    }
+                    out.push_str(&"  ".repeat(depth));
+                    out.push('}');
+                }
+            }
+        }
+        let mut out = String::new();
+        go(self, &mut out, 0);
+        out
+    }
+}
+
+impl<'de> Deserialize<'de> for Node {
+    fn deserialize<D: Deserializer<'de>>(d: D) -> std::result::Result<Node, D::Error> {
+        struct V;
+        impl<'de> Visitor<'de> for V {
+            type Value = Node;
+            fn expecting(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
+                f.write_str("JSON")
+            }
+            fn visit_bool<E>(self, v: bool) -> std::result::Result<Node, E> {
+                Ok(Node::Leaf(json!(v)))
+            }
+            fn visit_i64<E>(self, v: i64) -> std::result::Result<Node, E> {
+                Ok(Node::Leaf(json!(v)))
+            }
+            fn visit_u64<E>(self, v: u64) -> std::result::Result<Node, E> {
+                Ok(Node::Leaf(json!(v)))
+            }
+            fn visit_f64<E>(self, v: f64) -> std::result::Result<Node, E> {
+                Ok(Node::Leaf(json!(v)))
+            }
+            fn visit_str<E>(self, v: &str) -> std::result::Result<Node, E> {
+                Ok(Node::Leaf(json!(v)))
+            }
+            fn visit_string<E>(self, v: String) -> std::result::Result<Node, E> {
+                Ok(Node::Leaf(Value::String(v)))
+            }
+            fn visit_unit<E>(self) -> std::result::Result<Node, E> {
+                Ok(Node::Leaf(Value::Null))
+            }
+            fn visit_none<E>(self) -> std::result::Result<Node, E> {
+                Ok(Node::Leaf(Value::Null))
+            }
+            fn visit_seq<A: SeqAccess<'de>>(self, mut a: A) -> std::result::Result<Node, A::Error> {
+                let mut items = Vec::new();
+                while let Some(n) = a.next_element::<Node>()? {
+                    items.push(n.value());
+                }
+                Ok(Node::Leaf(Value::Array(items)))
+            }
+            fn visit_map<A: MapAccess<'de>>(self, mut a: A) -> std::result::Result<Node, A::Error> {
+                let mut n = Node::obj();
+                while let Some((k, v)) = a.next_entry::<String, Node>()? {
+                    n.set(&k, v);
+                }
+                Ok(n)
+            }
+        }
+        d.deserialize_any(V)
+    }
+}
 
 pub fn specs() -> Vec<CommandSpec> {
     vec![
@@ -114,29 +267,34 @@ fn round(x: f64) -> f64 {
 
 /// Put `token` at `path` / `last` under `group`, making the groups on the way (a token in the way
 /// of a group gives it its name).
-fn insert(group: &mut Map<String, Value>, path: &[String], last: &str, token: Value) {
+fn insert(group: &mut Node, path: &[String], last: &str, token: Node) {
     match path.split_first() {
-        None => {
-            group.insert(last.to_string(), token);
-        }
+        None => group.set(last, token),
         Some((p, rest)) => {
-            let next = group.entry(p.clone()).or_insert_with(|| Value::Object(Map::new()));
-            if !next.is_object() || next.get("$value").is_some() {
-                *next = Value::Object(Map::new());
+            let next = group.child(p);
+            if next.contains_key("$value") {
+                *next = Node::obj();
             }
-            if let Value::Object(m) = next {
-                insert(m, rest, last, token);
-            }
+            insert(next, rest, last, token);
         }
     }
 }
 
 /// The tokens of `colls` as a DTCG document.
 pub fn dtcg(doc: &Document, colls: &[&Collection]) -> Value {
+    tree(doc, colls).value()
+}
+
+/// The tokens of `colls` as DTCG JSON text, in the variables' order.
+pub fn dtcg_text(doc: &Document, colls: &[&Collection]) -> String {
+    tree(doc, colls).pretty()
+}
+
+fn tree(doc: &Document, colls: &[&Collection]) -> Node {
     let roles = Roles::new(doc);
-    let mut root = Map::new();
+    let mut root = Node::obj();
     for c in colls {
-        let mut group = Map::new();
+        let mut group = Node::obj();
         let default = c.modes.first().map(|m| m.id.clone());
         for v in doc.variables.variables.iter().filter(|v| v.collection == c.id) {
             let ty = dtcg_type(v, &roles);
@@ -148,18 +306,18 @@ pub fn dtcg(doc: &Document, colls: &[&Collection]) -> Value {
                 _ => doc.variables.resolve(&v.id, &modes_map).and_then(|x| value_json(doc, ty, &x)),
             };
             let Some(value) = value else { continue };
-            let mut token = Map::new();
+            let mut token = Node::obj();
             if let Some(t) = ty {
-                token.insert("$type".into(), json!(t));
+                token.set("$type", Node::Leaf(json!(t)));
             }
-            token.insert("$value".into(), value);
+            token.set("$value", Node::Leaf(value));
             let description: String = v.description.lines().filter(|l| !l.contains('{') && !l.contains("oklch(") && !l.contains("calc(")).collect::<Vec<_>>().join("\n");
             if !description.trim().is_empty() {
-                token.insert("$description".into(), json!(description.trim()));
+                token.set("$description", Node::Leaf(json!(description.trim())));
             }
-            let mut ext = Map::new();
+            let mut ext = Node::obj();
             if c.modes.len() > 1 {
-                let mut per = Map::new();
+                let mut per = Node::obj();
                 for m in &c.modes {
                     let modes: BTreeMap<_, _> = [(c.id.clone(), m.id.clone())].into_iter().collect();
                     let x = match v.values.get(&m.id) {
@@ -167,28 +325,30 @@ pub fn dtcg(doc: &Document, colls: &[&Collection]) -> Value {
                         _ => doc.variables.resolve(&v.id, &modes).and_then(|x| value_json(doc, ty, &x)),
                     };
                     if let Some(x) = x {
-                        per.insert(m.name.clone(), x);
+                        per.set(&m.name, Node::Leaf(x));
                     }
                 }
-                ext.insert(MODES.into(), Value::Object(per));
+                ext.set(MODES, per);
             }
             if let Some(f) = v.description.lines().find(|l| l.contains("calc(") || l.contains("oklch(") || l.contains("color-mix(")) {
-                ext.insert(FORMULA.into(), json!(f.trim()));
+                ext.set(FORMULA, Node::Leaf(json!(f.trim())));
             }
-            if !ext.is_empty() {
-                token.insert("$extensions".into(), Value::Object(ext));
+            if !ext.entries().is_empty() {
+                token.set("$extensions", ext);
             }
             // Into its groups.
             let parts: Vec<String> = v.name.split('/').map(segment).filter(|s| !s.is_empty()).collect();
             let Some((last, path)) = parts.split_last() else { continue };
-            insert(&mut group, path, last, Value::Object(token));
+            insert(&mut group, path, last, token);
         }
         if c.modes.len() > 1 {
-            group.insert("$extensions".into(), json!({MODES: c.modes.iter().map(|m| m.name.clone()).collect::<Vec<_>>()}));
+            let mut ext = Node::obj();
+            ext.set(MODES, Node::Leaf(json!(c.modes.iter().map(|m| m.name.clone()).collect::<Vec<_>>())));
+            group.set("$extensions", ext);
         }
-        root.insert(segment(&c.name), Value::Object(group));
+        root.set(&segment(&c.name), group);
     }
-    Value::Object(root)
+    root
 }
 
 fn export(s: &mut Session, p: &Value) -> Result<Value> {
@@ -205,7 +365,7 @@ fn export(s: &mut Session, p: &Value) -> Result<Value> {
             .collect::<Result<_>>()?,
         Some(_) => return Err(bad(cmd, "collections: [collection ids or names]")),
     };
-    let text = serde_json::to_string_pretty(&dtcg(doc, &colls)).map_err(|e| EngineError::Other(e.to_string()))?;
+    let text = dtcg_text(doc, &colls);
     match string(p, "path") {
         Some(path) => {
             super::file::write(&path, text.as_bytes())?;
@@ -225,26 +385,26 @@ struct Token {
     description: String,
 }
 
-fn walk(v: &Map<String, Value>, path: &mut Vec<String>, inherited: Option<String>, out: &mut Vec<Token>) {
-    let ty = v.get("$type").or_else(|| v.get("type")).and_then(Value::as_str).map(str::to_string).or(inherited);
+fn walk(v: &Node, path: &mut Vec<String>, inherited: Option<String>, out: &mut Vec<Token>) {
+    let ty = v.get("$type").or_else(|| v.get("type")).and_then(Node::as_str).map(str::to_string).or(inherited);
     let value = v.get("$value").or_else(|| v.get("value").filter(|_| !v.contains_key("$value")));
     if let Some(value) = value {
         // A token.
-        let mut values = vec![(None, value.clone())];
-        if let Some(Value::Object(modes)) = v.get("$extensions").and_then(|e| e.get(MODES)) {
-            values.extend(modes.iter().map(|(k, x)| (Some(k.clone()), x.clone())));
+        let mut values = vec![(None, value.value())];
+        if let Some(modes) = v.get("$extensions").and_then(|e| e.get(MODES)).filter(|m| m.is_obj()) {
+            values.extend(modes.entries().iter().map(|(k, x)| (Some(k.clone()), x.value())));
         }
-        let description = v.get("$description").or_else(|| v.get("description")).and_then(Value::as_str).unwrap_or_default().to_string();
+        let description = v.get("$description").or_else(|| v.get("description")).and_then(Node::as_str).unwrap_or_default().to_string();
         out.push(Token { path: path.clone(), ty, values, description });
         return;
     }
-    for (k, child) in v {
+    for (k, child) in v.entries() {
         if k.starts_with('$') {
             continue;
         }
-        if let Value::Object(m) = child {
+        if child.is_obj() {
             path.push(k.clone());
-            walk(m, path, ty.clone(), out);
+            walk(child, path, ty.clone(), out);
             path.pop();
         }
     }
@@ -373,10 +533,10 @@ fn dimension_ms(v: &Value) -> Option<f64> {
     }
 }
 
-fn read_json(cmd: &str, p: &Value) -> Result<Value> {
+fn read_json(cmd: &str, p: &Value) -> Result<Node> {
     let raw = match get(p, "json") {
         Some(Value::String(t)) => t.clone(),
-        Some(v @ Value::Object(_)) => return Ok(v.clone()),
+        Some(v @ Value::Object(_)) => return Ok(Node::from_value(v)),
         _ => return Err(bad(cmd, "json: DTCG JSON text, or a path")),
     };
     let text = if raw.trim_start().starts_with('{') {
@@ -398,11 +558,13 @@ fn read_json(cmd: &str, p: &Value) -> Result<Value> {
 
 fn import(s: &mut Session, p: &Value) -> Result<Value> {
     let cmd = "variable.importDtcg";
-    let json = read_json(cmd, p)?;
-    let Value::Object(root) = &json else { return Err(bad(cmd, "a DTCG document is a JSON object")) };
+    let root = read_json(cmd, p)?;
+    if !root.is_obj() {
+        return Err(bad(cmd, "a DTCG document is a JSON object"));
+    }
     let into = string(p, "collection").map(|c| c.trim().to_string()).filter(|c| !c.is_empty());
     let mut tokens = Vec::new();
-    walk(root, &mut Vec::new(), None, &mut tokens);
+    walk(&root, &mut Vec::new(), None, &mut tokens);
     let doc = s.doc_mut()?;
     let mut warnings: Vec<String> = Vec::new();
     // Which collection and which name each token goes to.
@@ -415,12 +577,20 @@ fn import(s: &mut Session, p: &Value) -> Result<Value> {
         }
     };
     // Mode names per collection, in first-seen order (the first mode is "Default" unless named).
-    let mut coll_modes: BTreeMap<String, Vec<String>> = BTreeMap::new();
+    // Collections in the file's order.
+    let mut coll_modes: Vec<(String, Vec<String>)> = Vec::new();
+    fn entry<'a>(list: &'a mut Vec<(String, Vec<String>)>, name: String) -> &'a mut Vec<String> {
+        let i = list.iter().position(|(n, _)| *n == name).unwrap_or_else(|| {
+            list.push((name, Vec::new()));
+            list.len() - 1
+        });
+        &mut list[i].1
+    }
     // A collection's own mode list keeps their order (the first is the default mode).
-    for (k, g) in root {
-        if let Some(Value::Array(list)) = g.get("$extensions").and_then(|e| e.get(MODES)) {
+    for (k, g) in root.entries() {
+        if let Some(Value::Array(list)) = g.get("$extensions").and_then(|e| e.get(MODES)).map(Node::value) {
             let name = into.clone().unwrap_or_else(|| k.clone());
-            let e = coll_modes.entry(name).or_default();
+            let e = entry(&mut coll_modes, name);
             for m in list.iter().filter_map(Value::as_str) {
                 if !e.iter().any(|x| x == m) {
                     e.push(m.to_string());
@@ -430,7 +600,7 @@ fn import(s: &mut Session, p: &Value) -> Result<Value> {
     }
     for t in &tokens {
         let (c, _) = place(&t.path);
-        let e = coll_modes.entry(c).or_default();
+        let e = entry(&mut coll_modes, c);
         for (m, _) in &t.values {
             if let Some(m) = m
                 && !e.contains(m)
@@ -633,6 +803,23 @@ mod tests {
         let prim2 = doc.variables.get("color/primary").unwrap();
         assert_eq!(prim2.values.get(&coll.modes[0].id), Some(&VariableValue::Alias(blue2.id.clone())));
         assert_eq!(doc.variables.get("space/m").unwrap().values.get(&coll.modes[0].id), Some(&VariableValue::Number(16.0)));
+    }
+
+    #[test]
+    fn tokens_keep_the_files_order() {
+        let mut s = Session::new();
+        let text = r#"{"Zeta": {"space": {"s": {"$type": "dimension", "$value": "8px"}, "m": {"$type": "dimension", "$value": "16px"}, "xs": {"$type": "dimension", "$value": "4px"}}}, "Alpha": {"b": {"$type": "number", "$value": 2}, "a": {"$type": "number", "$value": 1}}}"#;
+        s.execute("variable.importDtcg", &json!({"json": text})).unwrap();
+        let doc = s.doc().unwrap();
+        let names: Vec<&str> = doc.variables.collections.iter().map(|c| c.name.as_str()).collect();
+        assert_eq!(names, vec!["Zeta", "Alpha"], "collections in the file's order");
+        let vars: Vec<&str> = doc.variables.variables.iter().map(|v| v.name.as_str()).collect();
+        assert_eq!(vars, vec!["space/s", "space/m", "space/xs", "b", "a"], "tokens in the file's order");
+        let out = s.execute("variable.exportDtcg", &json!({})).unwrap();
+        let t = out["text"].as_str().unwrap();
+        let at = |k: &str| t.find(&format!("\"{k}\"")).unwrap();
+        assert!(at("Zeta") < at("Alpha") && at("s") < at("m") && at("m") < at("xs") && at("b") < at("a"), "and go out in it: {t}");
+        assert_eq!(serde_json::from_str::<Value>(t).unwrap()["Zeta"]["space"]["m"]["$value"], json!({"value": 16.0, "unit": "px"}));
     }
 
     #[test]

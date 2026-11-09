@@ -414,7 +414,7 @@ pub(crate) fn local_styles(app: &mut FigApp, ui: &mut Ui, doc: &Document) {
                         icons::paint(ui.painter(), eb.shrink(5.0), Icon::Adjust, t.icon);
                         edit_clicked = eresp.clicked();
                         name_w -= 28.0;
-                    } else if let StyleKind::Text { style } = &s.kind {
+                    } else if let StyleKind::Text { style, .. } = &s.kind {
                         let meta = format!("{}/{}", figcraft_doc::trim_num(style.font_size), style.line_height.label());
                         let g = ui.painter().text(pos2(r.max.x - widgets::PAD, r.center().y), Align2::RIGHT_CENTER, meta, regular(10.0), t.text_secondary);
                         name_w -= g.width() + 8.0;

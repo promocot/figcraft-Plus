@@ -585,7 +585,19 @@ pub(crate) fn picker(app: &mut FigApp, ctx: &egui::Context) {
         Target::Bind { field, .. } => Some(field.as_str()),
         _ => None,
     });
+    // The search text lives where FigCraft's picker keeps it, so what reads or sets it there works.
+    let query_id = Id::unique("variable_picker_query");
+    if let Some(q) = ctx.data(|d| d.get_temp::<String>(query_id))
+        && let Some(mut st) = ctx.data(|d| d.get_temp::<State>(id))
+        && st.query != q
+    {
+        st.query = q;
+        st.highlight = 0;
+        ctx.data_mut(|d| d.insert_temp(id, st));
+    }
     let outcome = card(ctx, id, p.at, tr("Variables"), &items, current.as_ref(), empty);
+    let q = ctx.data(|d| d.get_temp::<State>(id)).map(|st| st.query).unwrap_or_default();
+    ctx.data_mut(|d| d.insert_temp(query_id, q));
     crate::units_ui::list_for(None);
     // The switch may have changed the mode this frame: what a pick does follows it.
     let percent = crate::leading_ui::percent_rows();

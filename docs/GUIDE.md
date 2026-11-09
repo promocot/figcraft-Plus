@@ -259,6 +259,10 @@ in the left list › **Sort by name** / **Sort by value**.
 **You should see.** A drop line, a "2 variables" badge; they land there. Sort by name orders
 `n-xs, n-s, n-m, n-l, n-xl, n-2xl…`. Alt+↑ / ↓ moves the selection a row. Each is one undo step.
 
+**Not a Plus bug if.** Selecting rows (click, Shift, Ctrl) and the right-click menu for several
+variables (Delete, Move to group, Scope) are FigCraft's own since 0.17; Plus adds the dragging,
+Alt+↑ / ↓ and sorting.
+
 ### 21. Variables in text: weight, paragraph spacing and indent
 
 **Try it.** Number variables `weight/bold` = 700 and `space/para` = 16. Select a text; Typography ›
@@ -342,7 +346,8 @@ file › Variables › **Import** › **Design tokens (DTCG)…** › the same f
 
 **You should see.** The JSON has your collections as top-level groups, `$type` and `$value`
 (colours `#RRGGBB`, sizes `{"value": 16, "unit": "px"}`, aliases `{Brand.color.blue}`, other modes
-in `$extensions["figcraft.modes"]`). The import rebuilds the same collections, modes and aliases.
+in `$extensions["figcraft.modes"]`), in the order the variables have. The import rebuilds the same
+collections, modes and aliases, in the file's order.
 
 **Also check.** Import tokens made by another tool (Tokens Studio, Style Dictionary): colours,
 dimensions (`1rem` = 16), numbers, font weights (`bold` = 700), font families come in; shadows and
