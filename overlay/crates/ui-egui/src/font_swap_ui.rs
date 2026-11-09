@@ -51,10 +51,11 @@ pub(crate) fn commands(doc: &Document, family: &str, with: &str) -> Vec<Value> {
         }
     }
     for s in figcraft_engine::library::local_styles(doc) {
-        if let StyleKind::Text { style, .. } = &s.kind
+        if let StyleKind::Text { style, paragraph } = &s.kind
             && same(&style.font_family)
-            && let Ok(mut v) = serde_json::to_value(style)
         {
+            // With its paragraph settings, which `style.update` would reset otherwise.
+            let mut v = crate::styles_plus_ui::text_value(style, paragraph);
             v["font_family"] = json!(with);
             out.push(json!({"command": "style.update", "params": {"style": s.id, "value": v}}));
         }

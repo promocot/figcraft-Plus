@@ -18,10 +18,10 @@
     "insert": "mod presets_ui;"
   },
   {
-    "note": "export: Presets… (sizes, formats and a name pattern in one go)",
+    "note": "export: Presets… in the section's header (sizes, formats and a name pattern in one go)",
     "file": "crates/ui-egui/src/panels/export_panel.rs",
-    "find": "    for (i, e) in list.iter().enumerate() {\n        setting_row(app, ui, &ids, i, e, text, doc.color_profile);\n    }\n    let Some(first) = first else { return };\n",
-    "replace": "    for (i, e) in list.iter().enumerate() {\n        setting_row(app, ui, &ids, i, e, text, doc.color_profile);\n    }\n    // FigCraft Plus: sizes, formats and a name pattern in one go.\n    crate::presets_ui::row(app, ui, doc, sel);\n    let Some(first) = first else { return };\n"
+    "find": "    if mixed {\n        widgets::note(ui, tr(\"Click + to replace mixed content\"), t.text_secondary);\n    }\n",
+    "replace": "    // FigCraft Plus: Presets… in the header, beside + (sizes, formats and a name pattern in one go).\n    crate::presets_ui::header(app, ui, doc, sel);\n    if mixed {\n        widgets::note(ui, tr(\"Click + to replace mixed content\"), t.text_secondary);\n    }\n"
   },
   {
     "note": "English: presets and DTCG",

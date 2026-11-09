@@ -14,8 +14,8 @@
 use egui::{Align2, Color32, CornerRadius, Id, Rect, Sense, Stroke, Ui, pos2, vec2};
 use figcraft_color::{Color, Paint, PaintKind};
 use figcraft_doc::{
-    BlurType, Document, Effect, EffectKind, GridAlign, GridKind, LayoutGrid, LetterSpacing, LineHeight, MAX_BLUR_RADIUS, Style, StyleKind, TextCase,
-    TextDecoration, TextStyle, VariableType,
+    BlurType, Document, Effect, EffectKind, GridAlign, GridKind, LayoutGrid, LetterSpacing, LineHeight, ListStyle, MAX_BLUR_RADIUS, ParagraphStyle, Style,
+    StyleKind, TextCase, TextDecoration, TextStyle, VariableType,
 };
 use serde_json::{Value, json};
 
@@ -25,6 +25,7 @@ use crate::i18n::tr;
 use crate::icons::{self, Icon};
 use crate::right::{menu_check, menu_popup, row};
 use crate::style_picker::StyleSlot;
+use crate::styles_plus_ui::text_value;
 use crate::theme::{Tokens, regular, semibold};
 use crate::widgets::{self, FieldEdit, Lead};
 
@@ -297,7 +298,7 @@ pub(crate) fn show(app: &mut FigApp, ctx: &egui::Context) {
             }
         }
         match &st.kind {
-            StyleKind::Text { style, .. } => text_props(app, ui, &doc, &st, style, &mut d.more),
+            StyleKind::Text { style, paragraph } => text_props(app, ui, &doc, &st, style, paragraph, &mut d.more),
             StyleKind::Paint { paints } => paint_rows(app, ui, &doc, &st, paints),
             StyleKind::Effect { effects } => {
                 let labels: Vec<String> = effects.iter().map(|e| tr(e.label()).to_string()).collect();
@@ -592,11 +593,15 @@ fn remove(app: &mut FigApp, st: &Style, i: usize) {
 // ---------------------------------------------------------------------------------------------
 // Text
 
-fn text_props(app: &mut FigApp, ui: &mut Ui, doc: &Document, st: &Style, ts: &TextStyle, more: &mut bool) {
+#[allow(clippy::too_many_arguments)]
+fn text_props(app: &mut FigApp, ui: &mut Ui, doc: &Document, st: &Style, ts: &TextStyle, ps: &ParagraphStyle, more: &mut bool) {
     let full = W - 32.0;
     let half = (full - 8.0) / 2.0;
     let sid = st.id.clone();
-    let set = move |app: &mut FigApp, ts2: &TextStyle| set_value(app, &sid, json_of(ts2), None);
+    // Every rewrite carries the paragraph settings, which `style.update` would reset otherwise.
+    let set = move |app: &mut FigApp, ts2: &TextStyle| set_value(app, &sid, text_value(ts2, ps), None);
+    let sid = st.id.clone();
+    let set_para = move |app: &mut FigApp, ps2: &ParagraphStyle| set_value(app, &sid, text_value(ts, ps2), None);
     // Font family.
     row(ui, 32.0, |ui| {
         bindable(app, ui, doc, st, "fontFamily", VariableType::String, full, |app, ui| {
@@ -648,7 +653,7 @@ fn text_props(app: &mut FigApp, ui: &mut Ui, doc: &Document, st: &Style, ts: &Te
             edit_with(app, &st.id, e, |v| {
                 let mut ts2 = ts.clone();
                 ts2.font_size = v.clamp(1.0, 5000.0);
-                json_of(&ts2)
+                text_value(&ts2, ps)
             });
         });
     });
@@ -678,6 +683,22 @@ fn text_props(app: &mut FigApp, ui: &mut Ui, doc: &Document, st: &Style, ts: &Te
         if icons::button(ui, Icon::Dots, 24.0, *more, tr("More type settings")).clicked() {
             *more = !*more;
         }
+    });
+    // Paragraph spacing + indent (what text styles carry at the paragraph level since FigCraft 0.17).
+    widgets::sublabels(ui, tr("Paragraph spacing"), Some(tr("Paragraph indent")));
+    row(ui, 32.0, |ui| {
+        let e = widgets::number_field(ui, Id::unique(("sd_pspace", &st.id)), Lead::None, Some(ps.paragraph_spacing), "", half, 1.0);
+        edit_with(app, &st.id, e, |v| {
+            let mut ps2 = ps.clone();
+            ps2.paragraph_spacing = v.clamp(0.0, 10_000.0);
+            text_value(ts, &ps2)
+        });
+        let e = widgets::number_field(ui, Id::unique(("sd_pindent", &st.id)), Lead::None, Some(ps.paragraph_indent), "", half, 1.0);
+        edit_with(app, &st.id, e, |v| {
+            let mut ps2 = ps.clone();
+            ps2.paragraph_indent = v.clamp(0.0, 10_000.0);
+            text_value(ts, &ps2)
+        });
     });
     if *more {
         widgets::sublabels(ui, tr("Decoration"), Some(tr("Case")));
@@ -713,6 +734,22 @@ fn text_props(app: &mut FigApp, ui: &mut Ui, doc: &Document, st: &Style, ts: &Te
                         let mut ts2 = ts.clone();
                         ts2.case = c;
                         set(app, &ts2);
+                        ui.close();
+                    }
+                }
+            });
+        });
+        widgets::sublabels(ui, tr("List style"), None);
+        row(ui, 32.0, |ui| {
+            let lists = [(ListStyle::None, tr("No list")), (ListStyle::Bulleted, tr("Bulleted list")), (ListStyle::Numbered, tr("Numbered list"))];
+            let cur = lists.iter().find(|(l, _)| *l == ps.list).map_or("", |x| x.1);
+            let resp = widgets::dropdown(ui, cur, half, None);
+            menu_popup(&resp).show(|ui| {
+                for (l, label) in lists {
+                    if menu_check(ui, ps.list == l, label, "") {
+                        let mut ps2 = ps.clone();
+                        ps2.list = l;
+                        set_para(app, &ps2);
                         ui.close();
                     }
                 }

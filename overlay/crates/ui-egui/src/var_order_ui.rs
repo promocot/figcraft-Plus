@@ -54,9 +54,6 @@ fn drop_id() -> Id {
 fn sel_id() -> Id {
     Id::unique("vo_sel")
 }
-fn anchor_id() -> Id {
-    Id::unique("vo_anchor")
-}
 fn visible_id() -> Id {
     Id::unique("vo_visible")
 }

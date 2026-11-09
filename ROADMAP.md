@@ -24,8 +24,8 @@ Everything below serves one of them.
 | **5** | ✅ done in Plus 14 | Web typography and colour tokens |
 | **6** | ✅ done in Plus 14 | Print: resolution per frame, PDF/X |
 | **7** | ✅ done in Plus 15 | Export presets, design tokens (DTCG) |
-| **8** | ▶ now — Plus 17 | Everyday comfort |
-| **9** | Plus 18 | Export and tokens, complete |
+| **8** | ✅ done in Plus 17 | Everyday comfort |
+| **9** | ▶ now — Plus 18 | Export and tokens, complete |
 | **10** | Plus 19 | 🎨 Colour: tonal scales and the gamut |
 | **11** | Plus 20 | Responsive states and control |
 
@@ -34,7 +34,7 @@ release of their own, the rest joins the next stage.
 
 ---
 
-## ▶ Stage 8 — Plus 17: everyday comfort
+## ✅ Stage 8 — Plus 17: everyday comfort
 
 - **W / H in %, vw and vh in the field itself.** Choosing *Percent of parent* turns the field's
   pixels into a share (200 px of a 400 px parent reads `50%`, the layer keeps its size) and the
@@ -48,7 +48,7 @@ release of their own, the rest joins the next stage.
 - **A FigCraft release Plus doesn't fit opens an issue** here (the daily build already finds it;
   today only an e-mail says so).
 
-## Stage 9 — Plus 18: export and tokens, complete
+## ▶ Stage 9 — Plus 18: export and tokens, complete
 
 - **A full preset editor:** add or remove sizes, pick formats, not only the name and pattern.
 - **The file names before exporting** with a preset.
@@ -96,6 +96,7 @@ Full details in the [changelog](CHANGELOG.md).
 
 | Release | Highlights |
 |---|---|
+| **Plus 17** | W / H show their **% / vw / vh** share · key object with **Alt+click** · paragraph settings in the style dialog (and kept by every text style edit) · Presets… in the Export header · a failed build opens an issue |
 | **Plus 16** | On FigCraft 0.17.0 · variables use FigCraft's new multi-select · DTCG keeps the file's order |
 | **Plus 15** | On FigCraft 0.15.0 · **export presets** (sizes, formats, a name pattern) · **design tokens (DTCG)** both ways · the [guide](docs/GUIDE.md) |
 | **Plus 14** | **Line height in % from a variable** · **gradients blended in OKLCH** (gradient tokens) · **resolution (DPI) per frame** · **PDF/X-4** for coated FOGRA39 |

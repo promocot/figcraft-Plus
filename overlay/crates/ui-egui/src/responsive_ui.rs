@@ -2,14 +2,15 @@
 //! object on the canvas (`figcraft_engine::key_object`).
 //!
 //! - **% / vw / vh sizes.** The W / H sizing menu (Fixed, Hug, Fill) adds *Percent of parent* and
-//!   *Viewport (vw / vh)*; the menu then reads `50%` or `100vw`. In W / H, `100vw` or `50vh` typed
-//!   with the number makes the side relative to the frame the layer is in; on a side that is a
-//!   percentage already, `60%` changes the share (elsewhere `%` keeps FigCraft's meaning: a share
-//!   of the value there now). A plain size, or Fixed, ends it.
+//!   *Viewport (vw / vh)*. Picked, the layer keeps its size and the W / H field shows it as a share
+//!   (`50%`, `100vw`), edited right there: a plain number is a new share. In a field in px, `100vw`
+//!   or `50vh` typed with the number makes the side relative too (`%` there keeps FigCraft's
+//!   meaning: a share of the value there now). The menu names the mode (*Percent*, *Viewport*);
+//!   Fixed, Hug or Fill end it.
 //! - **Auto layout from variables.** The variable button at the end of the direction row opens
 //!   *Layout from variables*: direction, wrap, alignment and the W / H sizing, each following a
 //!   string (or boolean) variable — a mode switches them.
-//! - **Key object.** The layer clicked last in a multi-selection is outlined thicker: the align
+//! - **Key object.** The layer Alt+clicked in a multi-selection is outlined thicker: the align
 //!   buttons move the others to it.
 
 use std::cell::Cell;
@@ -87,23 +88,63 @@ pub(crate) fn unit(v: f64, unit: &str) -> Option<f64> {
     Some(base * v / 100.0)
 }
 
-/// The W (`horizontal`) or H field committed (`edited`): when a share was typed, make the side
-/// relative (true: the field's own px edit is not needed).
-pub(crate) fn after_field(app: &mut FigApp, ids: &[NodeId], horizontal: bool, edited: bool) -> bool {
-    let pending = PENDING.with(|p| p.take());
-    let Some((h, value, unit)) = pending.filter(|(h, _, _)| *h == horizontal && edited) else { return false };
-    let _ = h;
-    app.run("layout.relative", json!({"ids": ids, "axis": if horizontal { "width" } else { "height" }, "value": value, "unit": unit.suffix()}))
-        .is_some()
+/// The relative unit side `horizontal` has on every layer of `sel`, with each layer's share (None
+/// when a layer isn't relative, or not in that unit).
+fn shares(doc: &Document, sel: &[NodeId], horizontal: bool) -> Option<(Unit, Vec<f64>)> {
+    let rules: Vec<Option<(f64, Unit)>> = sel.iter().map(|i| responsive::size_rule(doc, *i, horizontal)).collect();
+    let unit = rules.first().copied().flatten()?.1;
+    let values = rules.iter().map(|r| r.filter(|(_, u)| *u == unit).map(|(v, _)| v)).collect::<Option<Vec<f64>>>()?;
+    Some((unit, values))
 }
 
-/// What the sizing menu reads for side `horizontal` of `sel`: the share, when every layer has the
-/// same one; else FigCraft's `label`.
+/// What the W (`horizontal`) or H field of `sel` shows: the share and its unit when the side is
+/// relative (no value: the layers' shares differ), else `px` as FigCraft shows it.
+pub(crate) fn shown(doc: &Document, sel: &[NodeId], horizontal: bool, px: Option<f64>) -> (Option<f64>, &'static str) {
+    match shares(doc, sel, horizontal) {
+        Some((unit, values)) => {
+            let first = values.first().copied();
+            let same = first.filter(|v| values.iter().all(|x| (x - v).abs() < 1e-9));
+            (same.map(|v| (v * 100.0).round() / 100.0), unit.suffix())
+        }
+        None => (px, ""),
+    }
+}
+
+/// The W (`horizontal`) or H field committed `edit`: a share typed with its unit makes the side
+/// relative; on a side that is relative, a plain number is its new share. True: done, the field's
+/// own px edit is not needed.
+pub(crate) fn after_field(app: &mut FigApp, ids: &[NodeId], horizontal: bool, edit: Option<&widgets::Edit>) -> bool {
+    let axis = if horizontal { "width" } else { "height" };
+    let pending = PENDING.with(|p| p.take());
+    if let Some((_, value, unit)) = pending.filter(|(h, _, _)| *h == horizontal && edit.is_some()) {
+        return app.run("layout.relative", json!({"ids": ids, "axis": axis, "value": value, "unit": unit.suffix()})).is_some();
+    }
+    let Some(edit) = edit else { return false };
+    let Some((unit, values)) = app.session.doc().ok().and_then(|doc| shares(doc, ids, horizontal)) else { return false };
+    let unit = unit.suffix();
+    match edit {
+        widgets::Edit::All(widgets::FieldEdit::Set(v) | widgets::FieldEdit::Scrub(v, _)) => {
+            app.run("layout.relative", json!({"ids": ids, "axis": axis, "value": v.max(0.0), "unit": unit}));
+        }
+        widgets::Edit::Each(rel) => {
+            for (id, cur) in ids.iter().zip(values) {
+                if let Some(v) = rel.apply(cur) {
+                    app.run("layout.relative", json!({"ids": [id], "axis": axis, "value": v.max(0.0), "unit": unit}));
+                }
+            }
+        }
+    }
+    true
+}
+
+/// What the sizing menu reads for side `horizontal` of `sel`: the mode (*Percent*, *Viewport*) when
+/// every layer's side is relative in the same unit (the share shows in W / H); else FigCraft's
+/// `label`.
 pub(crate) fn sizing_label<'a>(doc: &Document, sel: &[NodeId], horizontal: bool, label: &'a str) -> std::borrow::Cow<'a, str> {
-    let rules: Vec<Option<(f64, Unit)>> = sel.iter().map(|i| responsive::size_rule(doc, *i, horizontal)).collect();
-    match rules.first() {
-        Some(Some((v, u))) if rules.iter().all(|r| *r == rules[0]) => format!("{}{}", widgets::fmt_num(*v), u.suffix()).into(),
-        _ => label.into(),
+    match shares(doc, sel, horizontal) {
+        Some((Unit::Percent, _)) => tr("Percent").into(),
+        Some((Unit::Vw | Unit::Vh, _)) => tr("Viewport").into(),
+        None => label.into(),
     }
 }
 
@@ -286,4 +327,60 @@ pub(crate) fn relative_row(app: &mut FigApp, ui: &mut Ui, doc: &Document, sel: &
             });
         }
     });
+}
+
+#[cfg(test)]
+mod tests {
+    use egui::accesskit::Role;
+    use egui::{Event, Key, Modifiers, Pos2, pos2};
+    use figcraft_doc::NodeId;
+    use figcraft_engine::Session;
+    use figcraft_engine::responsive::{Unit, size_rule};
+    use serde_json::json;
+
+    use crate::layers_drag_tests::Ui;
+
+    /// Field `name`'s middle and the value it shows.
+    fn field(u: &mut Ui, name: &str) -> (Pos2, String) {
+        u.frame(vec![]);
+        let out = u.frame_output(vec![]);
+        let nodes = out.platform_output.accesskit_update.expect("an AccessKit update").nodes;
+        let n = nodes.iter().map(|(_, n)| n).find(|n| n.role() == Role::SpinButton && n.label() == Some(name)).unwrap_or_else(|| panic!("no field {name:?}"));
+        let b = n.bounds().expect("bounds");
+        (pos2(((b.x0 + b.x1) / 2.0) as f32, ((b.y0 + b.y1) / 2.0) as f32), n.value().unwrap_or_default().to_string())
+    }
+
+    fn type_into(u: &mut Ui, name: &str, text: &str) {
+        let (p, _) = field(u, name);
+        u.button(p, true);
+        u.button(p, false);
+        u.frame(vec![]);
+        u.frame(vec![Event::Text(text.into())]);
+        for pressed in [true, false] {
+            u.frame(vec![Event::Key { key: Key::Enter, physical_key: None, pressed, repeat: false, modifiers: Modifiers::NONE }]);
+        }
+        u.frame(vec![]);
+    }
+
+    #[test]
+    fn a_side_in_percent_shows_and_takes_its_share_in_the_field() {
+        let mut s = Session::new();
+        let parent = s.execute("frame.create", &json!({"x": 0, "y": 0, "width": 400, "height": 300})).unwrap()["id"].as_u64().unwrap();
+        let child = NodeId(s.execute("frame.create", &json!({"x": 20, "y": 20, "width": 200, "height": 100, "parent": parent})).unwrap()["id"].as_u64().unwrap());
+        s.execute("select.set", &json!({"ids": [child]})).unwrap();
+        let mut u = Ui::new(s);
+        u.ctx.enable_accesskit();
+        assert_eq!(field(&mut u, "Width").1, "200", "in px at first");
+        // Picking Percent of parent keeps the size: 200 of 400 is 50%.
+        u.app.run("layout.relative", json!({"ids": [child], "axis": "width", "unit": "%"}));
+        let shown = field(&mut u, "Width").1;
+        assert!(shown.starts_with("50") && shown.ends_with('%'), "the field shows the share: {shown}");
+        // A plain number is the new share.
+        type_into(&mut u, "Width", "75");
+        let doc = u.app.session.doc().unwrap();
+        assert_eq!(size_rule(doc, child, true), Some((75.0, Unit::Percent)));
+        assert!((doc.node(child).unwrap().width - 300.0).abs() < 0.01, "75% of 400");
+        // The height is still in px.
+        assert_eq!(field(&mut u, "Height").1, "100");
+    }
 }

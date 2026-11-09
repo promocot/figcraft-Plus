@@ -88,19 +88,27 @@ fn run(app: &mut FigApp, ids: &[NodeId], preset: &Preset) {
     });
 }
 
-/// In the Export section: the Presets menu.
-pub(crate) fn row(app: &mut FigApp, ui: &mut Ui, doc: &Document, sel: &[NodeId]) {
+/// In the Export section's header, just drawn above, left of its `+`: the Presets menu.
+pub(crate) fn header(app: &mut FigApp, ui: &mut Ui, doc: &Document, sel: &[NodeId]) {
     if sel.is_empty() {
         return;
     }
     let presets = get().export_presets;
     let own = own_items(doc, sel);
-    let resp = ui
-        .horizontal(|ui| {
-            ui.add_space(16.0);
-            widgets::button(ui, tr("Presets…"), false, true).on_hover_text(tr("Export with a preset: several sizes and formats, files named by a pattern"))
-        })
-        .inner;
+    let t = Tokens::get(ui.ctx());
+    // The header is the 40 pt row that ends where the cursor now starts.
+    let bottom = ui.cursor().min.y - ui.spacing().item_spacing.y;
+    let label = tr("Presets…");
+    let galley = ui.painter().layout_no_wrap(label.to_string(), crate::theme::regular(11.0), t.text);
+    let w = galley.size().x + 16.0;
+    let right = ui.max_rect().max.x - widgets::PAD_RIGHT - 24.0 - 4.0;
+    let r = egui::Rect::from_min_size(egui::pos2(right - w, bottom - 20.0 - 12.0), egui::vec2(w, 24.0));
+    let resp = ui.interact(r, Id::unique("figcraftplus_presets_button"), egui::Sense::click()).on_hover_text(tr("Export with a preset: several sizes and formats, files named by a pattern"));
+    resp.widget_info(|| egui::WidgetInfo::labeled(egui::Role::Button, true, label));
+    if resp.hovered() || egui::Popup::is_id_open(ui.ctx(), egui::Popup::default_response_id(&resp)) {
+        ui.painter().rect_filled(r, egui::CornerRadius::same(5), t.hover);
+    }
+    ui.painter().galley(egui::pos2(r.min.x + 8.0, r.center().y - galley.size().y / 2.0), galley, t.text);
     let mut chosen: Option<Preset> = None;
     let mut save = false;
     let mut edit = false;

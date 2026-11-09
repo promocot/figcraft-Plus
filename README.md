@@ -11,7 +11,7 @@
 </p>
 
 <p align="center">
-  <b>FigCraft Plus 16</b> · built on FigCraft <b>v0.17.0</b>, the latest official release ·
+  <b>FigCraft Plus 17</b> · built on FigCraft <b>v0.17.0</b>, the latest official release ·
   <code>.figcraft</code> files stay compatible with the official app, both ways
 </p>
 
@@ -116,8 +116,9 @@ what you edit are offered.
 > **Just done:** export presets and design tokens (DTCG) in Plus 15; line height in % from a
 > variable, gradients blended in OKLCH, **a resolution (DPI) per frame** and PDF/X-4 in Plus 14.
 >
-> **Now (Plus 17):** W / H in % edited in the field itself · key object with Alt+click · the style
-> dialog's paragraph settings · and more — see the [roadmap](ROADMAP.md).
+> **Just done (Plus 17):** W / H show their % / vw / vh share · key object with Alt+click · the
+> style dialog's paragraph settings. **Now (Plus 18):** a full export preset editor, file names
+> before exporting, DTCG typography and shadows — see the [roadmap](ROADMAP.md).
 >
 > Try the features with the [**guide**](docs/GUIDE.md) and [report](../../issues/new/choose) what
 > doesn't work or could be easier.
@@ -198,7 +199,7 @@ version; Plus goes further. Features FigCraft has since added itself are
 | [Variable details & scope, one click away](#variable-details--scope-one-click-away) | Right-click a variable ▸ Edit variable. | An *Edit variable* button on every row, opening beside the editor and following it. | 🔵 Enhanced |
 | [A richer variable picker](#a-richer-variable-picker) | A plain list of the variables that fit. | One card everywhere: search, library filter, collections and groups, swatches and values, arrow keys and Enter. | 🔵 Enhanced |
 | [Responsive layout: %, vw, vh and layout from variables](#responsive-layout-vw-vh-and-layout-from-variables) | Sizes are px, Hug or Fill; auto layout settings are fixed per frame. | **50%** of the parent, **100vw / 100vh** of the frame it sits in, kept in step; direction, wrap, alignment and sizing **from variables**, so modes switch them. | 🟣 Exclusive |
-| [Align to a key object](#align-to-a-key-object) | Several layers align to their combined box. | Click one of the selection: it becomes the key object, the others align to it and it stays put. | 🔵 Enhanced |
+| [Align to a key object](#align-to-a-key-object) | Several layers align to their combined box. | Alt+click one of the selection: it becomes the key object, the others align to it and it stays put. | 🔵 Enhanced |
 | [Design System Inspector](#design-system-inspector) | No check of the design system as a whole. | One list of what keeps it from holding together — values typed by hand that a variable holds, broken references, circular formulas, unused, unscoped and duplicate variables — each jumping to its layer or variable, most with a one-click fix. | 🟣 Exclusive |
 | [Variables as CSS for code, and from CSS](#variables-as-css-for-code-and-from-css) | Variables export as CSS in hex and px (formulas flattened) and import from JSON. | **CSS for code:** `oklch()`, `rem`, relative colours, `color-mix()`, `calc()`; and **import CSS custom properties** — `:root` and theme blocks as modes. | 🔵 Enhanced |
 | [Text styles together](#text-styles-together) | Text styles are edited one at a time. | Select several: set font, size, line height, letter spacing for all; bind variables to all of them by name, previewed, one undo step. | 🟣 Exclusive |
@@ -458,7 +459,7 @@ the files and keeps the last computed values.
 | **Decimals shown** — 0 to 4 | How many decimals fields show; values keep every digit |
 | **Colour picker opens in** — Hex, RGB, HSL, HSB, LCH, OKLCH, CMYK or CSS | The model the picker shows when it opens |
 | **Picker follows the selection** — on by default | Clicking another layer keeps the colour picker open on the same fill, stroke or effect; off, it closes as FigCraft's |
-| **Key object for aligning** — on by default | A click on one layer of a selection makes it the one the others align to |
+| **Key object for aligning** — on by default | Alt+click on one layer of a selection makes it the one the others align to |
 | **Resolution of new frames** — 72 by default | The DPI new top-level frames are made at: 72 for the web, 300 for print |
 
 They are saved in `figcraft-plus.json` next to `figcraft.exe`, so a copy on a USB drive keeps them.
@@ -623,8 +624,9 @@ The **Local styles** header (Design panel, nothing selected) has a **+**: choose
 **Color**, **Effect** or **Layout grid** and the **Create new … style** dialog opens — a preview,
 **Name** and **Description**, and **Properties**:
 
-- **Text** — font, style (or weight), size, line height, letter spacing, and under **…**
-  decoration and case.
+- **Text** — font, style (or weight), size, line height, letter spacing, paragraph spacing and
+  indent, and under **…** decoration, case and the list style (what FigCraft 0.17's text styles
+  carry; edits keep them).
 - **Color** — its paints: click the swatch for the full colour picker (solid, gradients, image…,
   OKLCH); hex and opacity in the row; **+** adds a paint.
 - **Effect** — a row per effect; click it for its settings beside the dialog: the **type**
@@ -743,12 +745,13 @@ in exports. That fixes imports that arrive in the wrong order (`n-xs, n-6xl, n-s
 
 - **`%` of the parent**, **`vw` / `vh` of the frame** the layer sits in (its viewport). Pick them in
   the W / H sizing menu (*Percent of parent*, *Viewport width / height*) — layers outside auto
-  layout get the menu too — or type `100vw`, `50vh` in W / H. The menu then reads `50%`.
+  layout get the menu too — or type `100vw`, `50vh` in W / H. The layer keeps its size; **W / H
+  then show the share** (`50%`, `100vw`) and take a new one as a plain number (`75`); the menu
+  names the mode (*Percent*, *Viewport*).
 - Resize the parent (or the frame) and the layer follows, its children by their constraints. A
   share of a share works. Inside auto layout the parent's padding is left out, as in CSS.
-- Typing a size by hand, dragging a handle, or picking Fixed / Hug / Fill ends the share for that
-  side. On a side that is a percentage, `60%` changes the share (elsewhere `%` keeps FigCraft's
-  meaning: a share of the value there now).
+- Dragging a handle, or picking Fixed / Hug / Fill, ends the share for that side (W / H are in px
+  again). In a W / H in px, `%` keeps FigCraft's meaning: a share of the value there now.
 - **Layout from variables:** the variable button at the end of an auto layout frame's direction
   row binds its **direction** (row / column / grid), **wrap**, **main and cross alignment**
   (start, center, end, space-between…) and its **W / H sizing** (hug, fill, fixed) to string or
@@ -765,12 +768,12 @@ in exports. That fixes imports that arrive in the wrong order (`n-xs, n-6xl, n-s
 
 > **FigCraft:** Several selected layers align to the box around all of them; a click on one of them selects just it.
 >
-> **FigCraft Plus:** With several layers selected, click one: it becomes the **key object** (a thicker outline), and the align buttons move the others to it while it stays put.
+> **FigCraft Plus:** With several layers selected, **Alt+click** one: it becomes the **key object** (a thicker outline), and the align buttons move the others to it while it stays put.
 
 <img src="docs/images/48-key-object.png" width="420" alt="Three selected rectangles, the middle one outlined thicker as the key object">
 
-- Click the key again to select just it, as before. Turn it off in **Preferences ▸ FigCraft Plus
-  ▸ Key object for aligning**.
+- Alt+click the key again to let it go; a plain click selects just one layer, as in FigCraft. Turn
+  it off in **Preferences ▸ FigCraft Plus ▸ Key object for aligning**.
 
 ### Design System Inspector
 
@@ -936,7 +939,7 @@ in exports. That fixes imports that arrive in the wrong order (`n-xs, n-6xl, n-s
 
 > **FigCraft:** Each layer has its own export settings (size, suffix, format); files are named after the layer.
 >
-> **FigCraft Plus:** **Presets…** in the Export section: every selected layer in several sizes and formats at once, named by a pattern.
+> **FigCraft Plus:** **Presets…** in the Export section's header: every selected layer in several sizes and formats at once, named by a pattern.
 
 - Four presets to start with: *Web · PNG 1x, 2x, 3x* (`{name}@{scale}`), *Social · 1080 px PNG and
   JPG*, *Every format* (a folder per format), *Print PDF* (CMYK, bleed, crop marks).

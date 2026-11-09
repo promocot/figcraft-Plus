@@ -210,12 +210,19 @@ inside). Lessons learned:
 
 ## 8. Where things stand (update this section when you finish work)
 
-- **Released:** Plus 16 on FigCraft v0.17.0 (2026-11-09).
+- **Released:** Plus 17 on FigCraft v0.17.0 (2026-11-09): roadmap stage 8.
+  - `responsive_ui::shown` / `after_field`: a relative W / H shows and takes its share (the field's
+    suffix is the unit, so `units_ui` leaves it alone); `sizing_label` names the mode.
+  - Key object: `key_object::click(sel, k, alt)`; only Alt+click picks it, so FigCraft's click rules
+    (and its selection tests) hold.
+  - `styles_plus_ui::text_value(style, paragraph)`: every `style.update` of a text style must send
+    the paragraph settings too (`style.update` resets those it isn't given).
+  - The `report` job of the build opens one issue per failing FigCraft release.
+- **Plus 16** on FigCraft v0.17.0 (2026-11-09).
   - FigCraft 0.17 selects several variables itself (`Editor::selected`, #2002): `var_order_ui::var_row`
     takes that selection (for drags and Alt+↑/↓) and paints nothing of its own.
-  - In this crate's tests FigCraft's own rules hold: `key_object` is off under `cfg(test)` and
-    `picker_place_ui::follows()` is off unless a test sets it, so FigCraft's selection and picker
-    tests pass; Plus's own tests turn them on.
+  - In the UI crate's tests `picker_place_ui::follows()` is off unless a test sets it, so FigCraft's
+    picker tests check FigCraft's rules; Plus's own tests turn it on.
   - `dtcg.rs` keeps key order with its own `Node` tree (serde_json's map sorts keys in this build;
     don't turn on `preserve_order`, it would change FigCraft's file output).
   - Text styles gained paragraph settings (`StyleKind::Text { style, paragraph }`): match them with

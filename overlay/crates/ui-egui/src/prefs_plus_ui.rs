@@ -42,17 +42,19 @@ pub(crate) struct Prefs {
     pub picker_follows_selection: bool,
     /// Missing font → the installed family that replaces it (remembered in Missing fonts).
     pub font_replacements: std::collections::BTreeMap<String, String>,
-    /// A click on a layer of a multi-selection makes it the key object the others align to.
+    /// Alt+click on a layer of a multi-selection makes it the key object the others align to.
     pub key_object: bool,
     /// The resolution (DPI) new top-level frames are made at.
     pub dpi: f64,
     /// Export presets (Export ▸ Presets…).
     pub export_presets: Vec<crate::presets_ui::Preset>,
+    /// The line-height variable picker's last px / % choice (it opens there next time).
+    pub leading_percent: bool,
 }
 
 impl Default for Prefs {
     fn default() -> Self {
-        Prefs { rem: false, text: String::new(), layout_unit: "px".into(), root: 16.0, color_model: "Hex".into(), precision: 2, picker_follows_selection: true, font_replacements: Default::default(), key_object: true, dpi: 72.0, export_presets: crate::presets_ui::defaults() }
+        Prefs { rem: false, text: String::new(), layout_unit: "px".into(), root: 16.0, color_model: "Hex".into(), precision: 2, picker_follows_selection: true, font_replacements: Default::default(), key_object: true, dpi: 72.0, export_presets: crate::presets_ui::defaults(), leading_percent: false }
     }
 }
 
@@ -212,7 +214,7 @@ pub(crate) fn preferences(ui: &mut Ui) {
         }
     })
     .response
-    .on_hover_text(tr("With several layers selected, click one: the others align to it. Click it again to select just it."));
+    .on_hover_text(tr("With several layers selected, Alt+click one: the others align to it. Alt+click it again to let it go."));
     ui.horizontal(|ui| {
         ui.label(tr("Resolution of new frames")).on_hover_text(tr("72 for the web; 300 for print. Each frame keeps its own, in Layout."));
         if let Some(FieldEdit::Set(v) | FieldEdit::Scrub(v, true)) =

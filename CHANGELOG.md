@@ -7,6 +7,23 @@ Every FigCraft Plus release, newest first. Each one is built on an official FigC
 **🟣 Exclusive** — FigCraft has nothing like it yet. **🔵 Enhanced** — FigCraft has a basic
 version; Plus goes further.
 
+## Plus 17 · FigCraft v0.17.0 — 2026-11-09
+
+Stage 8 of the roadmap: everyday comfort.
+
+- **W / H show their share.** Picking *Percent of parent* or *Viewport* in the sizing menu keeps
+  the layer's size and turns W / H into the share (`50%`, `100vw`); a plain number there is a new
+  share. The menu names the mode (*Percent*, *Viewport*) instead of repeating the value.
+- **Key object with Alt+click.** A plain click on one of several selected layers selects just it,
+  as in FigCraft; Alt+click makes it the key object (and Alt+click again lets it go).
+- **Paragraph settings in the style dialog:** paragraph spacing and indent, and the list style
+  under ⋯ — what text styles carry since FigCraft 0.17.
+- **Fix:** editing a text style in the dialog, several at once, or replacing a missing font reset
+  its paragraph settings (spacing, indent, list, OpenType features). They stay now.
+- The line height variable picker opens on your last px / % choice, after a restart too.
+- **Presets…** sits in the Export section's header, beside +.
+- A build that fails on a new FigCraft release opens an issue here.
+
 ## Plus 16 · FigCraft v0.17.0 — 2026-11-09
 
 Every add-on carried over to FigCraft 0.17.0.

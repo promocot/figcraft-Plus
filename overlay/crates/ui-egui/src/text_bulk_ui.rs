@@ -113,12 +113,18 @@ fn shared<T: PartialEq + Clone>(all: &[(&str, &str, &TextStyle)], f: impl Fn(&Te
 
 /// `style.update` for every style with `key` set to `value` (one undo step).
 fn set_all(app: &mut FigApp, all: &[(&str, &str, &TextStyle)], key: &str, value: Value) {
+    let doc = app.session.doc().ok().cloned();
     let commands: Vec<Value> = all
         .iter()
-        .filter_map(|(id, _, t)| {
-            let mut v = serde_json::to_value(t).ok()?;
+        .map(|(id, _, t)| {
+            // With its paragraph settings, which `style.update` would reset otherwise.
+            let paragraph = doc.as_ref().and_then(|d| d.style(id)).and_then(|s| match &s.kind {
+                StyleKind::Text { paragraph, .. } => Some((**paragraph).clone()),
+                _ => None,
+            });
+            let mut v = crate::styles_plus_ui::text_value(t, &paragraph.unwrap_or_default());
             v[key] = value.clone();
-            Some(json!({"command": "style.update", "params": {"style": id, "value": v}}))
+            json!({"command": "style.update", "params": {"style": id, "value": v}})
         })
         .collect();
     if !commands.is_empty() {

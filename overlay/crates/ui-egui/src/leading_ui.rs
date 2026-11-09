@@ -3,7 +3,8 @@
 //! - The variable picker of a line height (a text layer's, a text style's) has a **px | %** switch
 //!   under its search field: px binds the variable FigCraft's way, % makes the line height follow it
 //!   as a percentage of the font size (140 → 140%, 1.4 → 140%). The rows then show their values as
-//!   percentages (this file's variables only). The switch opens on how the field is bound now, else on the last choice (px, as FigCraft binds, until % is picked).
+//!   percentages (this file's variables only). The switch opens on how the field is bound now, else on the last choice, kept in the
+//!   preferences (px, as FigCraft binds, until % is picked).
 //! - A line height that follows a variable shows its chip, as a bound field does, with a `%`: a
 //!   click on it opens the picker, its detach button keeps the value and ends the link.
 
@@ -63,8 +64,28 @@ fn opens_in_percent(ctx: &egui::Context, doc: &Document, target: &Target) -> boo
     if px {
         return false;
     }
-    ctx.data(|d| d.get_temp::<bool>(remembered_id())).unwrap_or(false)
+    ctx.data(|d| d.get_temp::<bool>(remembered_id())).or_else(stored).unwrap_or(false)
 }
+
+/// The last choice kept in the Plus preferences, so it outlives the session (not in tests, which
+/// share one preferences store).
+#[cfg(not(test))]
+fn stored() -> Option<bool> {
+    Some(crate::prefs_plus_ui::get().leading_percent)
+}
+
+#[cfg(test)]
+fn stored() -> Option<bool> {
+    None
+}
+
+#[cfg(not(test))]
+fn store(percent: bool) {
+    crate::prefs_plus_ui::set(|p| p.leading_percent = percent);
+}
+
+#[cfg(test)]
+fn store(_: bool) {}
 
 /// The picker for `target` is about to draw: switch the line-height mode on (or off for any other
 /// target). Returns whether it binds in %.
@@ -129,6 +150,7 @@ pub(crate) fn switch(ui: &mut Ui, w: f32) {
                 d.insert_temp(remembered_id().with("open"), now);
                 d.insert_temp(remembered_id(), now);
             });
+            store(now);
         }
     }
 }

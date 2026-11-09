@@ -182,15 +182,16 @@ stored in the file).
 
 ### 13. Sizes in %, vw and vh
 
-**Try it.** Draw a frame 400 × 300, a rectangle inside it. Select the rectangle; in **W** type
-`50%`.
+**Try it.** Draw a frame 400 × 300, a frame 200 × 100 inside it. Select the inner one; W's sizing
+menu (under W) › **Percent of parent (%)**.
 
-**You should see.** The rectangle is 200 wide; W's sizing menu reads **50%**. Resize the frame to
-600: the rectangle becomes 300. Type `100vw` in W, `50vh` in H: the share of the top-level frame.
+**You should see.** The layer keeps its size; **W** now reads `50%` and the menu **Percent**. Type
+`75` in W: it is 300 wide (75% of 400). Resize the outer frame to 600: it becomes 450.
 
-**Also check.** The W / H sizing menu offers *Percent of parent (%)*, *Viewport width (vw)*,
-*Viewport height (vh)*. Typing a px size or dragging a handle ends the share. Inside auto layout,
-the parent's padding is left out.
+**Also check.** **Viewport width (vw)** / **Viewport height (vh)** the same way (W reads `100vw`,
+the menu **Viewport**). In a W still in px, `50%` (on a side already in %), `100vw` or `50vh` typed
+with the unit make it relative too. **Fixed**, **Hug** or **Fill** in the menu ends the share: W
+is in px again. Inside auto layout, the parent's padding is left out.
 
 ### 14. Auto layout from variables
 
@@ -204,14 +205,15 @@ to Mobile: it becomes a column. Also wrap, main and cross alignment, W / H sizin
 
 ### 15. Align to a key object
 
-**Try it.** Draw three rectangles at different heights. Select all three, then click the middle
-one once.
+**Try it.** Draw three rectangles at different heights. Select all three, then **Alt+click** the
+middle one.
 
 **You should see.** It gets a thicker outline (the key). **Align top**: the others move to its top;
-it stays put. Click it again: only it is selected.
-
-**Also check.** **Preferences › FigCraft Plus › Key object for aligning** off: a click selects just
+it stays put. Alt+click it again: the outline goes, the selection stays. A plain click selects just
 that layer, as in FigCraft.
+
+**Also check.** **Preferences › FigCraft Plus › Key object for aligning** off: Alt+click does
+nothing special.
 
 ### 16. Resolution (DPI) per frame
 
@@ -283,7 +285,7 @@ size from 24 to 40: the lines stay 140% of it.
 **Also check.** Change `leading/normal` to 150: the text follows. Type `30` in line height: the link
 ends (30 px). Detach (the button on the chip) keeps 140%. A text style's dialog (23) has the same.
 Variables › Export › CSS for code: `leading/normal` is written `1.4`. **px** in the switch binds as
-FigCraft does (pixels).
+FigCraft does (pixels). The switch opens on your last choice, after a restart too.
 
 ### 23. Styles created in a dialog
 
@@ -291,9 +293,13 @@ FigCraft does (pixels).
 Effect, Layout grid).
 
 **You should see.** *Create new text style*: a live preview (Rag 123), name, description, font,
-weight, size, line height, letter spacing — each can take a variable. **Create style** keeps it;
+weight, size, line height, letter spacing — each can take a variable — paragraph spacing and indent,
+and under **⋯** decoration, case and the list style. **Create style** keeps it;
 the close button removes it. Effect and grid: a settings card beside the dialog. Color: the swatch
 opens the picker beside the dialog.
+
+**Also check.** Right-click a text style › **Edit style**: change its size; its paragraph spacing,
+indent and list stay as they were.
 
 ### 24. Style groups
 
@@ -355,7 +361,8 @@ typography composites are skipped with a warning in the toast.
 
 ### 30. Export presets
 
-**Try it.** Select one or more frames › Design panel › **Export** › **Presets…** ›
+**Try it.** Select one or more frames › Design panel › **Export** (the section's header, left of
+**+**) › **Presets…** ›
 **Web · PNG 1x, 2x, 3x** › choose a folder.
 
 **You should see.** Three files per frame: `Card@1x.png`, `Card@2x.png`, `Card@3x.png`. Other

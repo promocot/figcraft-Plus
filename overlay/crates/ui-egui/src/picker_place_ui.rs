@@ -56,11 +56,17 @@ pub(crate) fn set_follows_for_test(on: Option<bool>) {
 
 /// Whether the picker follows the selection (the preference).
 pub(crate) fn follows() -> bool {
-    #[cfg(test)]
-    {
-        // Tests check FigCraft's own picker unless they turn following on.
-        return FOLLOWS_FOR_TEST.with(std::cell::Cell::get).unwrap_or(false);
-    }
+    preference()
+}
+
+// Tests check FigCraft's own picker unless they turn following on.
+#[cfg(test)]
+fn preference() -> bool {
+    FOLLOWS_FOR_TEST.with(std::cell::Cell::get).unwrap_or(false)
+}
+
+#[cfg(not(test))]
+fn preference() -> bool {
     crate::prefs_plus_ui::get().picker_follows_selection
 }
 

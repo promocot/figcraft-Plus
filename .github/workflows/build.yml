@@ -3,8 +3,8 @@
 # Every day it looks at the latest FigCraft release. When there is one this repository hasn't built
 # yet (or the custom features changed: bump CUSTOM_VERSION), it checks that release out, connects
 # overlay/ and hooks/ to it (scripts/apply.py), runs the tests and publishes a portable Windows
-# build under Releases. A run that fails leaves the previous release in place, and GitHub e-mails
-# the repository owner.
+# build under Releases. A run that fails leaves the previous release in place and opens an issue
+# (the `report` job), and GitHub e-mails the repository owner.
 name: Build FigCraft Plus
 
 on:
@@ -227,3 +227,32 @@ jobs:
           else
             gh release create "$RELEASE" dist/*.zip --title "FigCraft Plus ${PLUS} · FigCraft ${REF}" --notes-file notes.md --latest
           fi
+
+  # A build that fails opens an issue (once: while it is open, later runs add nothing), so a new
+  # FigCraft release the add-ons don't fit yet is on the tracker the day it comes out.
+  report:
+    needs: [plan, test, windows, release]
+    if: failure() && needs.plan.outputs.build == 'true'
+    runs-on: ubuntu-latest
+    permissions:
+      issues: write
+    steps:
+      - name: Open an issue
+        env:
+          GH_TOKEN: ${{ github.token }}
+          REF: ${{ needs.plan.outputs.ref }}
+          PLUS: ${{ needs.plan.outputs.plus }}
+          RUN: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+        run: |
+          title="FigCraft Plus ${PLUS} doesn't build on FigCraft ${REF}"
+          open=$(gh issue list --repo "$GITHUB_REPOSITORY" --state open --search "in:title \"${title}\"" --json title -q ".[] | select(.title == \"${title}\") | .title")
+          if [ -n "$open" ]; then
+            echo "Already reported: $title"
+            exit 0
+          fi
+          {
+            echo "The build of **FigCraft Plus ${PLUS}** on [FigCraft ${REF}](https://github.com/${UPSTREAM}/releases/tag/${REF}) failed: ${RUN}"
+            echo
+            echo "Most often FigCraft changed code a hook anchors to (\`scripts/apply.py\` names it), or an API the add-ons use. The previous release stays the latest until this is fixed."
+          } > body.md
+          gh issue create --repo "$GITHUB_REPOSITORY" --title "$title" --body-file body.md
