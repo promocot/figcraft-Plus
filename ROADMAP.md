@@ -24,21 +24,60 @@ Everything below serves one of them.
 | **5** | ✅ done in Plus 14 | Web typography and colour tokens |
 | **6** | ✅ done in Plus 14 | Print: resolution per frame, PDF/X |
 | **7** | ✅ done in Plus 15 | Export presets, design tokens (DTCG) |
-| ▶ | next | Your feedback: bugs and improvements from the [guide](docs/GUIDE.md)'s scenarios |
+| **8** | ▶ now — Plus 17 | Everyday comfort |
+| **9** | Plus 18 | Export and tokens, complete |
+| **10** | Plus 19 | 🎨 Colour: tonal scales and the gamut |
+| **11** | Plus 20 | Responsive states and control |
+
+Between the stages: your feedback from the [guide](docs/GUIDE.md)'s scenarios — urgent bugs get a
+release of their own, the rest joins the next stage.
 
 ---
+
+## ▶ Stage 8 — Plus 17: everyday comfort
+
+- **W / H in %, vw and vh in the field itself.** Choosing *Percent of parent* turns the field's
+  pixels into a share (200 px of a 400 px parent reads `50%`, the layer keeps its size) and the
+  share is edited there; the sizing menu only names the mode. The same for vw / vh.
+- **Key object with Alt+click.** A plain click on one of several selected layers selects just it,
+  as in FigCraft; Alt+click makes it the key object for aligning.
+- **Line height px / %** remembers the last choice.
+- **Presets…** moves into the Export section's header.
+- **The style dialog shows paragraph settings** FigCraft 0.17 gave text styles (spacing, indent,
+  lists).
+- **A FigCraft release Plus doesn't fit opens an issue** here (the daily build already finds it;
+  today only an e-mail says so).
+
+## Stage 9 — Plus 18: export and tokens, complete
+
+- **A full preset editor:** add or remove sizes, pick formats, not only the name and pattern.
+- **The file names before exporting** with a preset.
+- **DTCG composites:** typography and shadow tokens become text and effect styles, and styles go out
+  as tokens too.
+
+## Stage 10 — Plus 19: colour
+
+- **OKLCH tonal scale generator:** 50 … 950 from one colour, as variables that follow it.
+- **Gamut views in the picker:** lightness, chroma and hue slices of the gamut, to see how far a
+  colour can go.
+
+## Stage 11 — Plus 20: responsive states and control
+
+- **Responsive component states** (Desktop / Tablet / Mobile) switched by variable modes.
+- **A key to hide the selection outline** while editing.
+- **Remappable keyboard shortcuts.**
+
+## After stage 9: the guide in pictures
+
+Every step of the [guide](docs/GUIDE.md) checked in the app, with a screenshot, then a GIF per
+feature for the README.
 
 ## 💡 Ideas we are considering
 
 Not planned yet — a 👍 on a [feature request](../../issues?q=is%3Aissue+label%3Aenhancement) helps
 decide.
 
-- Responsive component states (Desktop / Tablet / Mobile) switched by variable modes
-- OKLCH tonal scale generator: 50 … 950 from one colour, as variables that follow it
-- OKLCH gamut views in the picker: lightness, chroma and hue slices of the gamut, to see how far a
-  colour can go
-- A key to hide the selection outline while editing
-- Remappable keyboard shortcuts
+- Yours: [ask for a feature](../../issues/new?template=feature_request.yml)
 
 ## Already in FigCraft — use it there
 

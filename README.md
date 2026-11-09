@@ -116,8 +116,11 @@ what you edit are offered.
 > **Just done:** export presets and design tokens (DTCG) in Plus 15; line height in % from a
 > variable, gradients blended in OKLCH, **a resolution (DPI) per frame** and PDF/X-4 in Plus 14.
 >
-> **Next:** your feedback — try the features with the [**guide**](docs/GUIDE.md) and
-> [report](../../issues/new/choose) what doesn't work or could be easier.
+> **Now (Plus 17):** W / H in % edited in the field itself · key object with Alt+click · the style
+> dialog's paragraph settings · and more — see the [roadmap](ROADMAP.md).
+>
+> Try the features with the [**guide**](docs/GUIDE.md) and [report](../../issues/new/choose) what
+> doesn't work or could be easier.
 >
 > **[See the full roadmap →](ROADMAP.md)** · **[Ask for a feature →](../../issues/new?template=feature_request.yml)**
 > — the most 👍-ed requests move up.
